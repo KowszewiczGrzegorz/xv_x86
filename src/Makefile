@@ -21,10 +21,12 @@ V=@
 all: $(BINDIR)/$(EXEC)
 
 $(BINDIR)/$(EXEC): $(OBJS)
+	$(V)test -d $(BINDIR) || mkdir -p $(BINDIR)
 	$(V)printf "$(GREEN)[BIN]$(WHITE) $@ \n"; 
 	$(V)$(CC) -o $@ $^ $(LDFLAGS) 
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cc
+	$(V)test -d $(OBJDIR) || mkdir -p $(OBJDIR)
 	$(V)printf "$(GREEN)[CXX]$(WHITE) $<\n"; 
 	$(V)$(CC) -c $< $(CFLAGS) -o $@
 
