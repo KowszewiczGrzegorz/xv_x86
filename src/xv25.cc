@@ -162,7 +162,7 @@ status_t XV25::getEncoder(motor_t motor)
 {
     status_t ret = STATUS_OK;
     string cmd = "getMotor ";
-    string *result = new string();
+    string result;
 
     switch (motor) {
         case leftWheel: cmd += "LeftWheel"; break;
@@ -171,14 +171,14 @@ status_t XV25::getEncoder(motor_t motor)
     }
     
     if (STATUS_OK == ret)
-        ret = commandWithResponse(cmd, result);
+        ret = commandWithResponse(cmd, &result);
 
     if (STATUS_OK == ret) {
         string encoderString = "Encoder,";        
-        size_t pos = result->find(encoderString);
+        size_t pos = result.find(encoderString);
         pos += encoderString.size();
-        size_t end = result->substr(pos).find('\n');
-        atoi(result->substr(pos, end).c_str());
+        size_t end = result.substr(pos).find('\n');
+        atoi(result.substr(pos, end).c_str());
     }
 
     return ret;
