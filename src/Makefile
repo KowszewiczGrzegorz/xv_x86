@@ -34,8 +34,8 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cc
 
 clean:
 	$(V)printf "$(RED)[clean]$(WHITE)\n";
-	$(V)rm -f $(OBJDIR)/*.o *~
+	$(V)rm -rf $(TOPDIR)/obj
 
 mrproper: clean
 	$(V)printf "$(RED)[mrproper]$(WHITE)\n";
-	$(V)rm -f $(BINDIR)/$(EXEC)
+	$(V)rm -rf $(TOPDIR)/bin
