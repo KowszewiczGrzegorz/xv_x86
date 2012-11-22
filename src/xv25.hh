@@ -34,14 +34,15 @@ public:
     status_t connect();
     void disconnect();
 
-    status_t command(string cmd, string *response);
-
     status_t getVersion(string*);
     status_t setTestMode(testMode_t);
     status_t setMotor(motor_t, int, int);
     status_t getEncoder(motor_t);
 
 private:
+    status_t command(string);
+    status_t commandWithResponse(string, string*);
+
     status_t send(string);
     string receive();
 

@@ -108,7 +108,12 @@ string XV25::receive(void)
     return response;
 }
 
-status_t XV25::command(string cmd, string *response)
+status_t XV25::command(string cmd)
+{
+    return send(cmd);
+}
+
+status_t XV25::commandWithResponse(string cmd, string *response)
 {
     status_t ret = STATUS_OK;
 
@@ -122,25 +127,14 @@ status_t XV25::command(string cmd, string *response)
 
 status_t XV25::getVersion(string* version)
 {
-    status_t ret = STATUS_OK;
-
-    if (STATUS_OK == send("GetVersion"))
-    	*version = receive();
-    else
-        ret = STATUS_ERROR;
-
-    return ret;
+    return commandWithResponse("GetVersion", version);
 }
 
 status_t XV25::setTestMode(testMode_t testMode)
 {
-    status_t ret;
     string cmd = "TestMode ";
     cmd += (testModeOn == testMode) ? "On" : "Off";
-
-    ret = send(cmd);
-
-    return ret;
+    return command(cmd);
 }
 
 status_t XV25::setMotor(motor_t motor, int speed, int distance)
@@ -158,7 +152,7 @@ status_t XV25::setMotor(motor_t motor, int speed, int distance)
         ostringstream oss;
         oss << distance << " Speed " << speed;
         cmd += oss.str();
-        ret = send(cmd);
+        ret = command(cmd);
     }
 
     return ret;
@@ -168,6 +162,7 @@ status_t XV25::getEncoder(motor_t motor)
 {
     status_t ret = STATUS_OK;
     string cmd = "getMotor ";
+    string *result = new string();
 
     switch (motor) {
         case leftWheel: cmd += "LeftWheel"; break;
@@ -176,16 +171,14 @@ status_t XV25::getEncoder(motor_t motor)
     }
     
     if (STATUS_OK == ret)
-        ret = send(cmd);
+        ret = commandWithResponse(cmd, result);
 
     if (STATUS_OK == ret) {
-        string encoderString = "Encoder,";
-        string result = receive();
-        
-        size_t pos = result.find(encoderString);
+        string encoderString = "Encoder,";        
+        size_t pos = result->find(encoderString);
         pos += encoderString.size();
-        size_t end = result.substr(pos).find('\n');
-        atoi(result.substr(pos, end).c_str());
+        size_t end = result->substr(pos).find('\n');
+        atoi(result->substr(pos, end).c_str());
     }
 
     return ret;
