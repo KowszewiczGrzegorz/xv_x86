@@ -13,7 +13,10 @@ int main (void)
     }
 
     xv25->getVersion(&version),
-    cerr << "XV25 version : \n--------------------\n" << version << "\n--------------------\n" << endl;
+    cout << "XV25 version " << endl;
+    cout << "---------------------------------------" << endl;
+    cout << version << endl;
+    cout << "---------------------------------------" << endl;
 
     xv25->disconnect();
 
