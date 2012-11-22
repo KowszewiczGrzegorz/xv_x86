@@ -108,6 +108,18 @@ string XV25::receive(void)
     return response;
 }
 
+status_t XV25::command(string cmd, string *response)
+{
+    status_t ret = STATUS_OK;
+
+    if (STATUS_OK == send(cmd))
+    	*response = receive();
+    else
+        ret = STATUS_ERROR;
+    
+    return ret;
+}
+
 status_t XV25::getVersion(string* version)
 {
     status_t ret = STATUS_OK;

@@ -34,6 +34,8 @@ public:
     status_t connect();
     void disconnect();
 
+    status_t command(string cmd, string *response);
+
     status_t getVersion(string*);
     status_t setTestMode(testMode_t);
     status_t setMotor(motor_t, int, int);
