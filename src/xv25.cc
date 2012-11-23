@@ -55,10 +55,16 @@ status_t XV25::send(string cmd)
     cerr << "Sending command \"" << (cmd.substr(0, cmd.size()-1)) << "\"" << endl;
 
     if (port > 0) {
-        for (uint8_t i = 0; i < cmd.size(); i++) {
+        for (uint8_t i = 0; i < cmd.size(); i++)
             write(port, &cmd[i], 1);
-            // Look at multiple bytes write()
-        }
+        /*
+        uint32_t nbBytes = 0;
+        string bytes;
+        do {
+            bytes = cmd.substr(nbBytes, cmd.size());
+            nbBytes += write(port, bytes.c_str(), bytes.size());
+        } while (nbBytes < cmd.size());        
+        */
     } else {
         ret = STATUS_ERROR;
     }
@@ -73,7 +79,6 @@ string XV25::receive(void)
 
     do {
         read(port, &byte, 1);
-        // Look at multiple byte reading
     } while (0 == byte);
     response += (char)byte;
 
@@ -81,19 +86,33 @@ string XV25::receive(void)
 
     if (0 < port) {
         do {
-            read(port, &byte, 1);
+            read(port, &byte, 1);        
 
             cerr << "read " << byte << endl;
 
             if (0 != byte)
                 response += (char)byte;
         } while (0 != byte);
+        
         if (response.size() > 0)
             response = response.substr(0, response.size()-1);
         for (uint32_t i = 0; i < 1000; i++) {
             usleep(1000);
             read(port, &byte, 1);
         }
+        /*
+        uint8_t nbBytes;
+        uint8_t nbBytesTotal = 0;
+        char *bytes = (char*) malloc (64 * sizeof(char));
+        do {
+            nbBytes = read(port, &bytes, 63);
+            if (nbBytes > 0) {
+                nbBytesTotal += nbBytes;
+                for (uint8_t i = 0; i < nbBytes; i++)
+                    response += bytes[i];
+            }
+        } while (nbBytes > 0);
+        */
     } else {
         cerr << "Failed to read from \"" << portName << "\"" << endl;
     }
