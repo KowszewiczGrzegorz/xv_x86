@@ -76,30 +76,43 @@ string XV25::receive(void)
 {
     string response;
     uint8_t byte;
-
-    do {
-        read(port, &byte, 1);
-    } while (0 == byte);
-    response += (char)byte;
-
-    cerr << "read " << byte << endl;
+    int nb;
+    bool gotEOF = false;
 
     if (0 < port) {
+        /*
+          do {
+          read(port, &byte, 1);
+          } while (0 == byte);
+        */
+        while (-1 == read(port, &byte, 1) && usleep(10));
+        response += (char)byte;
+
+        if (0 == byte)
+            cerr << "Got EOF !" << endl;
+        else
+            cerr << "read " << byte << endl;
+
         do {
-            read(port, &byte, 1);        
+            nb = read(port, &byte, 1);        
 
             cerr << "read " << byte << endl;
 
-            if (0 != byte)
-                response += (char)byte;
-        } while (0 != byte);
+            if (nb >= 0) {
+                if (0 == byte)
+                    gotEOF = true;
+                else
+                    response += (char)byte;
+            }
+        } while (nb >= 0);
         
-        if (response.size() > 0)
-            response = response.substr(0, response.size()-1);
-        for (uint32_t i = 0; i < 1000; i++) {
-            usleep(1000);
-            read(port, &byte, 1);
+        if (!gotEOF) {
+            for (uint32_t i = 0; i < 1000; i++) {
+                usleep(1000);
+                read(port, &byte, 1);
+            }
         }
+
         /*
         uint8_t nbBytes;
         uint8_t nbBytesTotal = 0;
@@ -125,10 +138,17 @@ void XV25::getEof(void)
     uint8_t byte;
 
     if (port > 0) {
+        while (-1 == read(port, &byte, 1));
+        if (0 == byte)
+            cerr << "Got EOF !" << endl;
+        else
+            cerr << "Got something (not EOF) : \"" << byte << "\"" << endl;
+        /*
         do {
             read(port, &byte, 1);
             // Look at multiple byte reading
         } while (0 == byte);
+        */
     }
 
     cerr << "getEof() : \"" << byte << "\" (should be EOF=\"" << EOF << "\")" << endl;

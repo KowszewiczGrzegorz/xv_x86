@@ -2,7 +2,7 @@ CC=g++
 CFLAGS=-W -Wall -Werror
 LDFLAGS=
 EXEC=xv25_test
-OBJECTS=main xv25 serial
+OBJECTS=main xv25
 
 ARCH=x86
 TOPDIR=..
