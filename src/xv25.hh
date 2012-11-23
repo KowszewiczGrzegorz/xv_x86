@@ -44,9 +44,8 @@ private:
     status_t command(string);
     status_t commandWithResponse(string, string*);
 
-    status_t send(string);
+    status_t send(string, bool);
     string receive();
-    void getEof();
 
     int port;
     string portName;

@@ -48,23 +48,27 @@ void XV25::disconnect()
 }
 
 
-status_t XV25::send(string cmd)
+status_t XV25::send(string cmd, bool needResponse)
 {
     status_t ret = STATUS_OK;
+    char byte;
+    int nb;
 
-    cerr << "Sending command \"" << (cmd.substr(0, cmd.size()-1)) << "\"" << endl;
+    cerr << "Sending command \"" << (cmd.substr(0, cmd.size()-2)) << "\"" << endl;
 
     if (port > 0) {
-        for (uint8_t i = 0; i < cmd.size(); i++)
+        for (uint8_t i = 0; i < cmd.size(); i++) {
             write(port, &cmd[i], 1);
-        /*
-        uint32_t nbBytes = 0;
-        string bytes;
-        do {
-            bytes = cmd.substr(nbBytes, cmd.size());
-            nbBytes += write(port, bytes.c_str(), bytes.size());
-        } while (nbBytes < cmd.size());        
-        */
+            do {
+                nb = read(port, &byte, 1);
+            } while (nb == -1 && byte != cmd[i]);
+            byte = 0;
+        }
+
+        if (!needResponse) {
+            usleep(400000);
+            while (-1 != read(port, &byte, 1));
+        }
     } else {
         ret = STATUS_ERROR;
     }
@@ -80,24 +84,11 @@ string XV25::receive(void)
     bool gotEOF = false;
 
     if (0 < port) {
-        /*
-          do {
-          read(port, &byte, 1);
-          } while (0 == byte);
-        */
         while (-1 == read(port, &byte, 1) && usleep(10));
         response += (char)byte;
 
-        if (0 == byte)
-            cerr << "Got EOF !" << endl;
-        else
-            cerr << "read " << byte << endl;
-
         do {
-            nb = read(port, &byte, 1);        
-
-            cerr << "read " << byte << endl;
-
+            nb = read(port, &byte, 1);
             if (nb >= 0) {
                 if (0 == byte)
                     gotEOF = true;
@@ -112,20 +103,6 @@ string XV25::receive(void)
                 read(port, &byte, 1);
             }
         }
-
-        /*
-        uint8_t nbBytes;
-        uint8_t nbBytesTotal = 0;
-        char *bytes = (char*) malloc (64 * sizeof(char));
-        do {
-            nbBytes = read(port, &bytes, 63);
-            if (nbBytes > 0) {
-                nbBytesTotal += nbBytes;
-                for (uint8_t i = 0; i < nbBytes; i++)
-                    response += bytes[i];
-            }
-        } while (nbBytes > 0);
-        */
     } else {
         cerr << "Failed to read from \"" << portName << "\"" << endl;
     }
@@ -133,42 +110,16 @@ string XV25::receive(void)
     return response;
 }
 
-void XV25::getEof(void)
-{
-    uint8_t byte;
-
-    if (port > 0) {
-        while (-1 == read(port, &byte, 1));
-        if (0 == byte)
-            cerr << "Got EOF !" << endl;
-        else
-            cerr << "Got something (not EOF) : \"" << byte << "\"" << endl;
-        /*
-        do {
-            read(port, &byte, 1);
-            // Look at multiple byte reading
-        } while (0 == byte);
-        */
-    }
-
-    cerr << "getEof() : \"" << byte << "\" (should be EOF=\"" << EOF << "\")" << endl;
-}
-
 status_t XV25::command(string cmd)
 {
-    status_t ret;
-
-    if (STATUS_OK == (ret = send(cmd+"\n"))) 
-        getEof();
-    
-    return ret;
+    return send(cmd+"\r\n", false);
 }
 
 status_t XV25::commandWithResponse(string cmd, string *response)
 {
     status_t ret = STATUS_OK;
 
-    if (STATUS_OK == send(cmd+"\n"))
+    if (STATUS_OK == send(cmd+"\r\n", true))
     	*response = receive();
     else
         ret = STATUS_ERROR;

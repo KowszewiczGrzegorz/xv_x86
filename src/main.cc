@@ -12,22 +12,21 @@ int main (void)
 	return -1;
     }
 
-    /*
-    xv25->GetVersion(&version);
+    xv25->getVersion(&version);
     cout << "XV25 version " << endl;
     cout << "---------------------------------------" << endl;
     cout << version << endl;
     cout << "---------------------------------------" << endl;
-    */
 
     xv25->setTestMode(testModeOn);
-    sleep(1);
 
     xv25->setMotor(leftWheel, 300, 1000);
-    sleep(5);
+    sleep(1);
+
+    xv25->setMotor(leftWheel, 300, -1000);
+    sleep(1);
 
     xv25->setTestMode(testModeOff);
-    sleep(1);
 
     xv25->disconnect();
 
