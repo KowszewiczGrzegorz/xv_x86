@@ -36,6 +36,7 @@ public:
 
     status_t getVersion(string*);
     status_t setTestMode(testMode_t);
+
     status_t setMotor(motor_t, int, int);
     status_t getEncoder(motor_t);
 
@@ -45,6 +46,7 @@ private:
 
     status_t send(string);
     string receive();
+    void getEof();
 
     int port;
     string portName;

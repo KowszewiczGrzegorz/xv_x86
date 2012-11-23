@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <sstream>
 #include <errno.h>
-#include "xv25.hh"
 #include <string.h>
-#include "serial.h"
+#include <stdint.h>
+#include "xv25.hh"
 
 
 XV25::XV25(string portName)
@@ -20,8 +20,19 @@ XV25::~XV25()
 status_t XV25::connect()
 {
     status_t ret = STATUS_OK;
+    struct termios tio;
 
-    port = serial_open(portName.c_str(), B9600);
+    memset(&tio, 0, sizeof(tio));
+    tio.c_cflag = CS8 | CREAD | CLOCAL;
+    tio.c_cc[VMIN] = 1;
+    tio.c_cc[VTIME] = 5;
+
+    port = open(portName.c_str(), O_RDWR | O_NONBLOCK);
+
+    cfsetospeed(&tio, B9600);
+    cfsetispeed(&tio, B9600);
+    tcsetattr(port, TCSANOW, &tio);
+
     if (port <= 0) {
         cerr << "Failed to open \"" << portName << "\"" << endl;
         ret = STATUS_ERROR;
@@ -32,7 +43,7 @@ status_t XV25::connect()
 
 void XV25::disconnect()
 {
-    if (0 < port)
+    if (port > 0)
         close(port);
 }
 
@@ -43,9 +54,14 @@ status_t XV25::send(string cmd)
 
     cerr << "Sending command \"" << (cmd.substr(0, cmd.size()-1)) << "\"" << endl;
 
-    if (port > 0)
-        for (uint8_t i = 0; i < cmd.size(); i++)
-            serial_send(port, cmd[i]);
+    if (port > 0) {
+        for (uint8_t i = 0; i < cmd.size(); i++) {
+            write(port, &cmd[i], 1);
+            // Look at multiple bytes write()
+        }
+    } else {
+        ret = STATUS_ERROR;
+    }
 
     return ret;
 }
@@ -56,7 +72,8 @@ string XV25::receive(void)
     uint8_t byte;
 
     do {
-        byte = serial_recv(port);
+        read(port, &byte, 1);
+        // Look at multiple byte reading
     } while (0 == byte);
     response += (char)byte;
 
@@ -64,7 +81,7 @@ string XV25::receive(void)
 
     if (0 < port) {
         do {
-            byte = serial_recv(port);
+            read(port, &byte, 1);
 
             cerr << "read " << byte << endl;
 
@@ -75,7 +92,7 @@ string XV25::receive(void)
             response = response.substr(0, response.size()-1);
         for (uint32_t i = 0; i < 1000; i++) {
             usleep(1000);
-            serial_recv(port);
+            read(port, &byte, 1);
         }
     } else {
         cerr << "Failed to read from \"" << portName << "\"" << endl;
@@ -84,14 +101,26 @@ string XV25::receive(void)
     return response;
 }
 
+void XV25::getEof(void)
+{
+    uint8_t byte;
+
+    if (port > 0) {
+        do {
+            read(port, &byte, 1);
+            // Look at multiple byte reading
+        } while (0 == byte);
+    }
+
+    cerr << "getEof() : \"" << byte << "\" (should be EOF=\"" << EOF << "\")" << endl;
+}
+
 status_t XV25::command(string cmd)
 {
-    status_t ret = STATUS_OK;
+    status_t ret;
 
-    if (STATUS_OK == send(cmd+"\n"))
-        receive();
-    else
-        ret = STATUS_ERROR;
+    if (STATUS_OK == (ret = send(cmd+"\n"))) 
+        getEof();
     
     return ret;
 }
@@ -115,15 +144,13 @@ status_t XV25::getVersion(string* version)
 
 status_t XV25::setTestMode(testMode_t testMode)
 {
-    string tmp;
     string cmd = "TestMode ";
     cmd += (testModeOn == testMode) ? "On" : "Off";
-    return commandWithResponse(cmd, &tmp);
+    return command(cmd);
 }
 
 status_t XV25::setMotor(motor_t motor, int speed, int distance)
 {
-    string tmp;
     status_t ret = STATUS_OK;;
     string cmd = "SetMotor ";
 
@@ -137,7 +164,7 @@ status_t XV25::setMotor(motor_t motor, int speed, int distance)
         ostringstream oss;
         oss << distance << " Speed " << speed;
         cmd += oss.str();
-        ret = commandWithResponse(cmd, &tmp);
+        ret = command(cmd);
     }
 
     return ret;
