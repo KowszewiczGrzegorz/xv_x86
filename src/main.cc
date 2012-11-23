@@ -12,21 +12,41 @@ int main (void)
 	return -1;
     }
 
+    /*
     xv25->getVersion(&version);
     cout << "XV25 version " << endl;
     cout << "---------------------------------------" << endl;
     cout << version << endl;
     cout << "---------------------------------------" << endl;
+    */
 
     xv25->setTestMode(testModeOn);
 
-    xv25->setMotor(leftWheel, 300, 1000);
-    sleep(1);
+    /*
+    int position;
+    xv25->getPosition(leftWheel, &position);
+    cerr << "Position de demarrage: " << position << endl;
 
-    xv25->setMotor(leftWheel, 300, -1000);
-    sleep(1);
+    xv25->setMotor(leftWheel, 300, 1000);
+
+    for (int i = 0; i < 7; i++) {
+        sleep(1);
+        xv25->getPosition(leftWheel, &position);
+        cerr << "Position (" << i << "): " << position << endl;
+    }
 
     xv25->setTestMode(testModeOff);
+    */
+
+    int battery;
+    xv25->getBatteryLevel(&battery);
+    cerr << "Battery level : " << battery << "%" << endl;
+
+    ldsScan_t scan;
+    xv25->startLDS();
+    sleep(1);
+    xv25->getLDSScan(&scan);
+    xv25->stopLDS();
 
     xv25->disconnect();
 

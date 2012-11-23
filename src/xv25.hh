@@ -24,7 +24,12 @@ typedef enum {
     leftWheel,
     rightWheel
 } motor_t;
-    
+
+typedef struct {
+    int distInMM[360];
+    int intensity[360];
+    int errorCode[360];
+} ldsScan_t;
 
 class XV25 {
 public:
@@ -38,7 +43,13 @@ public:
     status_t setTestMode(testMode_t);
 
     status_t setMotor(motor_t, int, int);
-    status_t getEncoder(motor_t);
+    status_t getPosition(motor_t, int*);
+
+    status_t getBatteryLevel(int*);
+
+    status_t startLDS();
+    status_t stopLDS();
+    status_t getLDSScan(ldsScan_t*);
 
 private:
     status_t command(string);

@@ -54,7 +54,7 @@ status_t XV25::send(string cmd, bool needResponse)
     char byte;
     int nb;
 
-    cerr << "Sending command \"" << (cmd.substr(0, cmd.size()-2)) << "\"" << endl;
+    // cerr << "Sending command \"" << (cmd.substr(0, cmd.size()-2)) << "\"" << endl;
 
     if (port > 0) {
         for (uint8_t i = 0; i < cmd.size(); i++) {
@@ -66,7 +66,7 @@ status_t XV25::send(string cmd, bool needResponse)
         }
 
         if (!needResponse) {
-            usleep(400000);
+            usleep(500000);
             while (-1 != read(port, &byte, 1));
         }
     } else {
@@ -84,11 +84,13 @@ string XV25::receive(void)
     bool gotEOF = false;
 
     if (0 < port) {
-        while (-1 == read(port, &byte, 1) && usleep(10));
+        while (-1 == read(port, &byte, 1))
+            usleep(1000);
         response += (char)byte;
 
         do {
             nb = read(port, &byte, 1);
+
             if (nb >= 0) {
                 if (0 == byte)
                     gotEOF = true;
@@ -160,12 +162,12 @@ status_t XV25::setMotor(motor_t motor, int speed, int distance)
     return ret;
 }
 
-status_t XV25::getEncoder(motor_t motor)
+status_t XV25::getPosition(motor_t motor, int* position)
 {
     status_t ret = STATUS_OK;
     string cmd = "getMotor ";
     string result;
-
+    
     switch (motor) {
         case leftWheel: cmd += "LeftWheel"; break;
         case rightWheel: cmd += "RightWheel"; break;
@@ -176,12 +178,62 @@ status_t XV25::getEncoder(motor_t motor)
         ret = commandWithResponse(cmd, &result);
 
     if (STATUS_OK == ret) {
-        string encoderString = "Encoder,";        
-        size_t pos = result.find(encoderString);
-        pos += encoderString.size();
+        string tmp = "PositionInMM,";        
+        size_t pos = result.find(tmp);
+        pos += tmp.size();
         size_t end = result.substr(pos).find('\n');
-        atoi(result.substr(pos, end).c_str());
+        *position = atoi(result.substr(pos, end).c_str());
     }
 
+    return ret;
+}
+
+status_t XV25::getBatteryLevel(int* battery)
+{
+    status_t ret = STATUS_OK;
+    string cmd = "getCharger";
+    string result;
+    
+    if (STATUS_OK == ret)
+        ret = commandWithResponse(cmd, &result);
+
+    if (STATUS_OK == ret) {
+        string tmp = "FuelPercent,";        
+        size_t pos = result.find(tmp);
+        pos += tmp.size();
+        size_t end = result.substr(pos).find('\n');
+        *battery = atoi(result.substr(pos, end).c_str());
+    }
+
+    return ret;
+}
+
+status_t XV25::startLDS()
+{
+    string cmd = "SetLDSRotation On";
+    return command(cmd);
+}
+
+status_t XV25::stopLDS()
+{
+    string cmd = "SetLDSRotation Off";
+    return command(cmd);
+}
+
+status_t XV25::getLDSScan(ldsScan_t */*scan*/)
+{
+    status_t ret = STATUS_OK;
+    string cmd = "getLDSScan";
+    string result;
+    
+    if (STATUS_OK == ret)
+        ret = commandWithResponse(cmd, &result);
+    
+    if (STATUS_OK == ret) {
+        cerr << "+++++++++++++++++++++++++" << endl;
+        cerr << result << endl;
+        cerr << "+++++++++++++++++++++++++" << endl;
+     }
+    
     return ret;
 }
