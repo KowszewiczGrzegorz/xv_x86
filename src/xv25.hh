@@ -57,6 +57,8 @@ private:
 
     status_t send(string, bool);
     string receive();
+ 
+    status_t getLDSMesure(string, int*, int*, int*, int*);
 
     int port;
     string portName;

@@ -54,7 +54,7 @@ status_t XV25::send(string cmd, bool needResponse)
     char byte;
     int nb;
 
-    // cerr << "Sending command \"" << (cmd.substr(0, cmd.size()-2)) << "\"" << endl;
+    //    cerr << "Sending command \"" << (cmd.substr(0, cmd.size()-2)) << "\"" << endl;
 
     if (port > 0) {
         for (uint8_t i = 0; i < cmd.size(); i++) {
@@ -92,11 +92,13 @@ string XV25::receive(void)
             nb = read(port, &byte, 1);
 
             if (nb >= 0) {
+                usleep(10);
                 if (0 == byte)
                     gotEOF = true;
                 else
                     response += (char)byte;
-            }
+            } 
+
         } while (nb >= 0);
         
         if (!gotEOF) {
@@ -220,19 +222,53 @@ status_t XV25::stopLDS()
     return command(cmd);
 }
 
-status_t XV25::getLDSScan(ldsScan_t */*scan*/)
+status_t XV25::getLDSMesure(string line, int* angle, int* distance, int* intensity, int* error)
+{
+    status_t ret = STATUS_OK;
+    int start = 0, current;
+
+    current = line.find_first_of(',');
+
+    *angle = atoi(line.substr(0, current).c_str());
+    start += current + 1;
+
+    current = line.substr(start).find_first_of(',');
+    *distance = atoi(line.substr(start, current).c_str());
+    start += current + 1;
+
+    current = line.substr(start).find_first_of(',');
+    *intensity = atoi(line.substr(start, current).c_str());
+    start += current + 1;
+
+    *error = atoi(line.substr(start, line.size()-1).c_str());
+
+    return ret;
+}
+
+status_t XV25::getLDSScan(ldsScan_t *scan)
 {
     status_t ret = STATUS_OK;
     string cmd = "getLDSScan";
     string result;
+    result.reserve(4000);
     
     if (STATUS_OK == ret)
         ret = commandWithResponse(cmd, &result);
     
     if (STATUS_OK == ret) {
-        cerr << "+++++++++++++++++++++++++" << endl;
-        cerr << result << endl;
-        cerr << "+++++++++++++++++++++++++" << endl;
+        int start = result.find_first_of('\n') + 1;
+        int current;
+        int angle, distance, intensity, error;
+        do {
+            current = result.substr(start).find_first_of('\n');
+            getLDSMesure(result.substr(start, current-1), &angle, &distance, &intensity, &error);
+            if (0 <= angle && angle < 360) {
+                scan->distInMM[angle] = distance;
+                scan->intensity[angle] = intensity;
+                scan->errorCode[angle] = error;
+            }
+            start += current + 1;
+        } while (angle < 359);
      }
     
     return ret;

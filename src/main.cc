@@ -1,6 +1,15 @@
+#include <math.h>
 #include "xv25.hh"
 
 static const string portName = "/dev/ttyACM0";
+
+
+void p2c (int angle, int distance, double* x, double *y)
+{
+    *x = distance * cos(angle*3.1415926535/180.0);
+    *y = distance * sin(angle*3.1415926535/180.0);
+}
+
 
 int main (void)
 {
@@ -44,9 +53,19 @@ int main (void)
 
     ldsScan_t scan;
     xv25->startLDS();
-    sleep(1);
+    sleep(2);
     xv25->getLDSScan(&scan);
     xv25->stopLDS();
+
+    FILE *fp = fopen("scan.csv", "w");
+    double x, y;
+    if (NULL != fp) {
+        for (int i = 0; i < 359; i++) {
+            p2c(i, scan.distInMM[i], &x, &y);
+            fprintf(fp, "%g\t%g\n", x, y);
+        }
+        fclose(fp);
+    }
 
     xv25->disconnect();
 
