@@ -29,8 +29,8 @@ status_t XV25::connect()
 
     port = open(portName.c_str(), O_RDWR | O_NONBLOCK);
 
-    cfsetospeed(&tio, B9600);
-    cfsetispeed(&tio, B9600);
+    cfsetospeed(&tio, B921600);
+    cfsetispeed(&tio, B921600);
     tcsetattr(port, TCSANOW, &tio);
 
     if (port <= 0) {
@@ -54,7 +54,7 @@ status_t XV25::send(string cmd, bool needResponse)
     char byte;
     int nb;
 
-    //    cerr << "Sending command \"" << (cmd.substr(0, cmd.size()-2)) << "\"" << endl;
+    cerr << "Sending command \"" << (cmd.substr(0, cmd.size()-2)) << "\"" << endl;
 
     if (port > 0) {
         for (uint8_t i = 0; i < cmd.size(); i++) {
@@ -63,10 +63,11 @@ status_t XV25::send(string cmd, bool needResponse)
                 nb = read(port, &byte, 1);
             } while (nb == -1 && byte != cmd[i]);
             byte = 0;
+            usleep(10);
         }
 
         if (!needResponse) {
-            usleep(500000);
+            usleep(10);
             while (-1 != read(port, &byte, 1));
         }
     } else {
@@ -85,14 +86,14 @@ string XV25::receive(void)
 
     if (0 < port) {
         while (-1 == read(port, &byte, 1))
-            usleep(1000);
+            usleep(1);
         response += (char)byte;
 
         do {
             nb = read(port, &byte, 1);
 
             if (nb >= 0) {
-                usleep(10);
+                usleep(1);
                 if (0 == byte)
                     gotEOF = true;
                 else
@@ -103,13 +104,18 @@ string XV25::receive(void)
         
         if (!gotEOF) {
             for (uint32_t i = 0; i < 1000; i++) {
-                usleep(1000);
+                usleep(1);
                 read(port, &byte, 1);
             }
         }
     } else {
         cerr << "Failed to read from \"" << portName << "\"" << endl;
     }
+
+    cerr << "Read ++++++++++++++++++" << endl;
+    cerr << response << endl;
+    cerr << "+++++++++++++++++++++++" << endl;
+
 
     return response;
 }

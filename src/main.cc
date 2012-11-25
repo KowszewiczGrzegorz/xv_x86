@@ -8,7 +8,7 @@ static const string portName = "/dev/ttyACM0";
 int main (void)
 {
     XV25 *xv25 = new XV25(portName);
-    // PointsLibrary *pl = new PointsLibrary();
+    PointsLibrary *pl = new PointsLibrary();
     string version;
 
     if (STATUS_ERROR == xv25->connect()) {
@@ -16,15 +16,13 @@ int main (void)
 	return -1;
     }
 
-    /*
+    
     xv25->getVersion(&version);
     cout << "XV25 version " << endl;
     cout << "---------------------------------------" << endl;
     cout << version << endl;
     cout << "---------------------------------------" << endl;
-    */
-
-    xv25->setTestMode(testModeOn);
+    
 
     /*
     int position;
@@ -46,6 +44,10 @@ int main (void)
     xv25->getBatteryLevel(&battery);
     cerr << "Battery level : " << battery << "%" << endl;
 
+    usleep(1000);
+    xv25->setTestMode(testModeOn);
+    usleep(1000);
+
     ldsScan_t scan;
     xv25->startLDS();
     sleep(3);
@@ -53,8 +55,8 @@ int main (void)
     double lSpeed, rSpeed;
     double dist90;
     // double dist45;
-    int t;
-    while (t < 100) {
+    int t = 0;;
+    while (t < 1) {
         xv25->getLDSScan(&scan);
         
         dist90 = xv25->getDistanceAtAngle(&scan, 90);
@@ -70,8 +72,8 @@ int main (void)
         */
 
         cerr << "dist = " << dist90 << " => cmd motor = [" << lSpeed << ", " << rSpeed << "]" << endl;
-        xv25->setMotor(leftWheel, lSpeed, 10000);
-        xv25->setMotor(rightWheel, rSpeed, 10000);
+        // xv25->setMotor(leftWheel, lSpeed, 10000);
+        // xv25->setMotor(rightWheel, rSpeed, 10000);
 
         usleep(10000);
         t++;
@@ -79,13 +81,12 @@ int main (void)
 
     xv25->stopLDS();
 
-    /*
     FILE *fp = fopen("scan.csv", "w");
     vector<point_t> points;
     point_t p;
     if (NULL != fp) {
         for (int i = 0; i < 359; i++) {
-            if (0 != scan.distInMM[i] && scan.distInMM[i] < 1000.0) {
+            if (0 < scan.distInMM[i] && scan.distInMM[i] < 1000.0) {
                 p = pl->p2c(i, scan.distInMM[i]);
                 if (p.y > 0) {
                     points.push_back(p);
@@ -99,7 +100,6 @@ int main (void)
     vector<line_t> lines = pl->ropeAlgorithm(points);
     for (uint32_t i = 0; i < lines.size(); i++)
         cerr << "Line " << i << " = " << lines[i].a << "*x + " << lines[i].b << "*y + " << lines[i].c << endl;
-    */
 
     xv25->setTestMode(testModeOff);
 
