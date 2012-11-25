@@ -273,3 +273,17 @@ status_t XV25::getLDSScan(ldsScan_t *scan)
     
     return ret;
 }
+
+
+uint32_t XV25::getDistanceAtAngle (ldsScan_t* scan, uint32_t angle)
+{
+    uint32_t minI = max((uint32_t)0, angle-2);
+    uint32_t maxI = min(angle+2, (uint32_t)259);
+    double average = 0;
+    uint32_t cnt = 0;
+    for (uint32_t i = minI; i < maxI; i++) {
+        average += scan->distInMM[minI];
+        cnt++;
+    }
+    return (average / cnt);    
+}

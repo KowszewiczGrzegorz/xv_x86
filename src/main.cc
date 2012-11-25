@@ -1,19 +1,14 @@
 #include <math.h>
+#include <stdint.h>
 #include "xv25.hh"
+#include "pointsLibrary.hh"
 
 static const string portName = "/dev/ttyACM0";
-
-
-void p2c (int angle, int distance, double* x, double *y)
-{
-    *x = distance * cos(angle*3.1415926535/180.0);
-    *y = distance * sin(angle*3.1415926535/180.0);
-}
-
 
 int main (void)
 {
     XV25 *xv25 = new XV25(portName);
+    // PointsLibrary *pl = new PointsLibrary();
     string version;
 
     if (STATUS_ERROR == xv25->connect()) {
@@ -53,19 +48,60 @@ int main (void)
 
     ldsScan_t scan;
     xv25->startLDS();
-    sleep(2);
-    xv25->getLDSScan(&scan);
+    sleep(3);
+
+    double lSpeed, rSpeed;
+    double dist90;
+    // double dist45;
+    int t;
+    while (t < 100) {
+        xv25->getLDSScan(&scan);
+        
+        dist90 = xv25->getDistanceAtAngle(&scan, 90);
+        lSpeed = 150.0 + (400.0 - dist90)/100;
+        rSpeed = 150.0 - (400.0 - dist90)/100;
+
+        /*
+        dist45 = xv25->getDistanceAtAngle(45.0);
+        if (dist45 < 400.0) {
+            lSpeed += 400 - dist45;
+            rSpeed -= 400 - dist45;
+        }
+        */
+
+        cerr << "dist = " << dist90 << " => cmd motor = [" << lSpeed << ", " << rSpeed << "]" << endl;
+        xv25->setMotor(leftWheel, lSpeed, 10000);
+        xv25->setMotor(rightWheel, rSpeed, 10000);
+
+        usleep(10000);
+        t++;
+    }
+
     xv25->stopLDS();
 
+    /*
     FILE *fp = fopen("scan.csv", "w");
-    double x, y;
+    vector<point_t> points;
+    point_t p;
     if (NULL != fp) {
         for (int i = 0; i < 359; i++) {
-            p2c(i, scan.distInMM[i], &x, &y);
-            fprintf(fp, "%g\t%g\n", x, y);
+            if (0 != scan.distInMM[i] && scan.distInMM[i] < 1000.0) {
+                p = pl->p2c(i, scan.distInMM[i]);
+                if (p.y > 0) {
+                    points.push_back(p);
+                    fprintf(fp, "%g\t%g\n", p.x, p.y);
+                }
+            }
         }
         fclose(fp);
     }
+    pl->setMaxDistanceRopeAlgorithm(50.0);
+    vector<line_t> lines = pl->ropeAlgorithm(points);
+    for (uint32_t i = 0; i < lines.size(); i++)
+        cerr << "Line " << i << " = " << lines[i].a << "*x + " << lines[i].b << "*y + " << lines[i].c << endl;
+    */
+
+    xv25->setTestMode(testModeOff);
 
     xv25->disconnect();
 

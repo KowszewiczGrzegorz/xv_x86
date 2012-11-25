@@ -5,8 +5,12 @@
 #include <unistd.h>
 #include <termios.h>
 #include <sys/ioctl.h>
+#include "pointsLibrary.hh"
 
 using namespace std;
+
+#ifndef __XV25_H__
+#define __XV25_H__
 
 static const int STRING_SIZE = 64;
 
@@ -51,6 +55,8 @@ public:
     status_t stopLDS();
     status_t getLDSScan(ldsScan_t*);
 
+    uint32_t getDistanceAtAngle(ldsScan_t*, uint32_t);
+
 private:
     status_t command(string);
     status_t commandWithResponse(string, string*);
@@ -63,3 +69,6 @@ private:
     int port;
     string portName;
 };
+
+
+#endif /* __XV25_H__ */

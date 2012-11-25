@@ -2,7 +2,7 @@ CC=g++
 CFLAGS=-W -Wall -Werror -lm
 LDFLAGS=
 EXEC=xv25_test
-OBJECTS=main xv25
+OBJECTS=main xv25 pointsLibrary
 
 ARCH=x86
 TOPDIR=..
