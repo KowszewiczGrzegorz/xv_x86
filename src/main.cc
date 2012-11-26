@@ -15,13 +15,13 @@ int main (void)
 	return -1;
     }
 
-    
+    /*
     xv25->getVersion(&version);
     cout << "XV25 version " << endl;
     cout << "---------------------------------------" << endl;
     cout << version << endl;
     cout << "---------------------------------------" << endl;
-    
+    */
 
     /*
     int position;
@@ -39,44 +39,52 @@ int main (void)
     xv25->setTestMode(testModeOff);
     */
 
+    /*    
     int battery;
     xv25->getBatteryLevel(&battery);
     cerr << "Battery level : " << battery << "%" << endl;
+    */
 
-    usleep(1000);
+    
     xv25->setTestMode(testModeOn);
-    usleep(1000);
+    sleep(1);
 
     xv25->startLDS();
     sleep(3);
-
-#if 0
+    
     double lSpeed, rSpeed;
     ldsScan_t scan;
-    int t = 0;;
-    while (t < 1) {
+    int t = 0;
+    while (t < 500) {
         xv25->getLDSScan(&scan);
         
-        double dist90 = xv25->getDistanceAtAngle(&scan, 90);
-        lSpeed = 150.0 + (400.0 - dist90)/100;
-        rSpeed = 150.0 - (400.0 - dist90)/100;
+        double dist = xv25->getDistanceAtAngle(&scan, 70);
+        lSpeed = 50 + (400.0 - dist)/3;
+        rSpeed = 50 - (400.0 - dist)/3;
 
         /*
-        double dist45 = xv25->getDistanceAtAngle(45.0);
+        double dist45 = xv25->getDistanceAtAngle(&scan, 45.0);
+        if (dist45 < dist60 && dist45 < 400) {
+            lSpeed = rSpeed = 20;
+        } else {
+            
+        }
+        */
+        /*
         if (dist45 < 400.0) {
             lSpeed += 400 - dist45;
             rSpeed -= 400 - dist45;
         }
         */
 
-        cerr << "dist = " << dist90 << " => cmd motor = [" << lSpeed << ", " << rSpeed << "]" << endl;
+        cerr << "dist = " << dist << " => cmd motor = [" << lSpeed << ", " << rSpeed << "]" << endl;
+        xv25->setMotors(lSpeed, rSpeed, 30);
         // xv25->setMotor(leftWheel, lSpeed, 100);
         // xv25->setMotor(rightWheel, rSpeed, 100);
 
-        usleep(10000);
+        // usleep(100);
         t++;
     }
-#endif
 
     xv25->stopLDS();
 

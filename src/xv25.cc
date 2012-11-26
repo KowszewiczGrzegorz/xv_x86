@@ -54,21 +54,27 @@ status_t XV25::send(string cmd, bool needResponse)
     char byte;
     int nb;
 
+    while (-1 != read(port, &byte, 1))
+        usleep(10);
+
     cerr << "Sending command \"" << (cmd.substr(0, cmd.size()-2)) << "\"" << endl;
 
     if (port > 0) {
         for (uint8_t i = 0; i < cmd.size(); i++) {
             write(port, &cmd[i], 1);
             do {
+                usleep(10);
                 nb = read(port, &byte, 1);
-            } while (nb == -1 && byte != cmd[i]);
+            } while (nb == -1 || byte != cmd[i]);
             byte = 0;
             usleep(10);
         }
+        cerr << endl;
 
         if (!needResponse) {
             usleep(10);
-            while (-1 != read(port, &byte, 1));
+            while (-1 != read(port, &byte, 1) || 0 == byte)
+                usleep(10);
         }
     } else {
         ret = STATUS_ERROR;
@@ -112,10 +118,11 @@ string XV25::receive(void)
         cerr << "Failed to read from \"" << portName << "\"" << endl;
     }
 
+    /*
     cerr << "Read ++++++++++++++++++" << endl;
     cerr << response << endl;
     cerr << "+++++++++++++++++++++++" << endl;
-
+    */
 
     return response;
 }
@@ -166,6 +173,21 @@ status_t XV25::setMotor(motor_t motor, int speed, int distance)
         cmd += oss.str();
         ret = command(cmd);
     }
+
+    return ret;
+}
+
+status_t XV25::setMotors(int lDist, int rDist, int speed)
+{
+    status_t ret = STATUS_OK;;
+    string cmd = "SetMotor ";
+
+    ostringstream oss;
+    oss << " LWheelDist " << lDist;
+    oss << " RWheelDist " << rDist; 
+    oss << " Speed " << speed;
+    cmd += oss.str();
+    ret = command(cmd);
 
     return ret;
 }
