@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include "xv25.hh"
 
+static const uint32_t bufferSize = 64;
+
 
 XV25::XV25(string portName)
 {
@@ -47,7 +49,6 @@ void XV25::disconnect()
         close(port);
 }
 
-
 status_t XV25::send(string cmd, bool needResponse)
 {
     status_t ret = STATUS_OK;
@@ -75,6 +76,54 @@ status_t XV25::send(string cmd, bool needResponse)
             usleep(10);
             while (-1 != read(port, &byte, 1) || 0 == byte)
                 usleep(10);
+        }
+    } else {
+        ret = STATUS_ERROR;
+    }
+
+    return ret;
+}
+
+status_t XV25::sendMultiple(string cmd, bool needResponse)
+{
+    status_t ret = STATUS_OK;
+    char bytes[bufferSize];
+    int nbWrite, nbRead;
+    uint32_t nbSent = 0;
+
+    while (-1 != read(port, &bytes, bufferSize))
+        usleep(10);
+
+    cerr << "Sending command \"" << (cmd.substr(0, cmd.size()-2)) << "\"" << endl;
+
+    if (port > 0) {
+        while (nbSent < cmd.size()) {
+            nbWrite = write(port, cmd.substr(nbSent, bufferSize-nbSent).c_str(), bufferSize);
+
+            cerr << "    sent \"" << (cmd.substr(nbSent, nbWrite)) << "\"" << endl;
+
+            nbSent += nbWrite;
+
+            do {
+                usleep(10);
+                nbRead = read(port, &bytes, bufferSize);
+
+                cerr << "    read " << nbRead << " bytes << : \"" << bytes << "\"" << endl;
+            
+            } while (nbRead == -1 || nbWrite != nbRead || bytes[nbRead-1] != cmd[nbSent]);
+            bytes[0] = 0;
+            usleep(10);
+        }
+
+        if (!needResponse) {
+            usleep(10);
+            do {
+                nbRead = read(port, &bytes, 1);
+
+                cerr << "    read(flush) " << nbRead << " bytes << : \"" << bytes << "\"" << endl;
+
+            } while (-1 == nbRead || 0 == bytes[nbRead-1]);
+            usleep(10);
         }
     } else {
         ret = STATUS_ERROR;
@@ -127,17 +176,70 @@ string XV25::receive(void)
     return response;
 }
 
+string XV25::receiveMultiple(void)
+{
+    string response;
+    uint8_t bytes[bufferSize];
+    int nb;
+    bool gotEOF = false;
+
+    cerr << "ReceiveMultiple()" << endl;
+
+    if (0 < port) {
+        do {
+            nb = read(port, &bytes, bufferSize);
+            usleep(1);
+        } while (-1 == nb);
+        bytes[nb] = '\0';
+        response += (char*)bytes;
+
+        cerr << "    received " << nb << " bytes : \"" << ((char*)bytes) << "\"" << endl;
+
+        do {
+            nb = read(port, &bytes, bufferSize-1);
+
+            if (nb >= 0) {
+                usleep(1);
+                if (0 == bytes[nb-1])
+                    gotEOF = true;
+                bytes[nb] = '\0';
+                response += (char*)bytes;
+
+                cerr << "    received " << nb << " bytes : \"" << ((char*)bytes) << "\"" << endl;
+            } 
+
+        } while (nb >= 0);
+        
+        if (!gotEOF) {
+            for (uint32_t i = 0; i < 1000 && !gotEOF; i++) {
+                usleep(1);
+                nb = read(port, &bytes, bufferSize-1);
+                if (-1 != nb && 0 == bytes[nb-1])
+                    gotEOF = true;
+            }
+        }
+    } else {
+        cerr << "Failed to read from \"" << portName << "\"" << endl;
+    }
+
+    cerr << "Read ++++++++++++++++++" << endl;
+    cerr << response << endl;
+    cerr << "+++++++++++++++++++++++" << endl;
+
+    return response;
+}
+
 status_t XV25::command(string cmd)
 {
-    return send(cmd+"\r\n", false);
+    return sendMultiple(cmd+"\r\n", false);
 }
 
 status_t XV25::commandWithResponse(string cmd, string *response)
 {
     status_t ret = STATUS_OK;
 
-    if (STATUS_OK == send(cmd+"\r\n", true))
-    	*response = receive();
+    if (STATUS_OK == sendMultiple(cmd+"\r\n", true))
+    	*response = receiveMultiple();
     else
         ret = STATUS_ERROR;
     

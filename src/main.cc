@@ -5,26 +5,29 @@
 
 static const string portName = "/dev/ttyACM0";
 
-int main (void)
+
+void getVersion(XV25 *xv25) 
 {
-    XV25 *xv25 = new XV25(portName);
     string version;
-
-    if (STATUS_ERROR == xv25->connect()) {
-        cerr << "Failed to connect to \"" << portName << "\"" << endl;
-	return -1;
-    }
-
-    /*
     xv25->getVersion(&version);
     cout << "XV25 version " << endl;
     cout << "---------------------------------------" << endl;
     cout << version << endl;
     cout << "---------------------------------------" << endl;
-    */
+}
 
-    /*
+void getBatteryLevel(XV25 *xv25)
+{
+    int battery;
+    xv25->getBatteryLevel(&battery);
+    cerr << "Battery level : " << battery << "%" << endl;
+}
+
+void getPosition(XV25 *xv25) 
+{
     int position;
+
+    xv25->setTestMode(testModeOn);
     xv25->getPosition(leftWheel, &position);
     cerr << "Position de demarrage: " << position << endl;
 
@@ -37,15 +40,10 @@ int main (void)
     }
 
     xv25->setTestMode(testModeOff);
-    */
+}
 
-    /*    
-    int battery;
-    xv25->getBatteryLevel(&battery);
-    cerr << "Battery level : " << battery << "%" << endl;
-    */
-
-    
+void wallFollower(XV25 *xv25) 
+{
     xv25->setTestMode(testModeOn);
     sleep(1);
 
@@ -87,12 +85,25 @@ int main (void)
     }
 
     xv25->stopLDS();
+    xv25->setTestMode(testModeOff);
+}
 
-    /*
+void ropeAlgorithm (XV25 *xv25) 
+{
     PointsLibrary *pl = new PointsLibrary();
     FILE *fp = fopen("scan.csv", "w");
     vector<point_t> points;
     point_t p;
+    ldsScan_t scan;
+
+    xv25->setTestMode(testModeOn);
+    sleep(1);
+
+    xv25->startLDS();
+    sleep(3);
+
+    xv25->getLDSScan(&scan);
+
     if (NULL != fp) {
         for (int i = 0; i < 359; i++) {
             if (0 < scan.distInMM[i] && scan.distInMM[i] < 1000.0) {
@@ -109,9 +120,22 @@ int main (void)
     vector<line_t> lines = pl->ropeAlgorithm(points);
     for (uint32_t i = 0; i < lines.size(); i++)
         cerr << "Line " << i << " = " << lines[i].a << "*x + " << lines[i].b << "*y + " << lines[i].c << endl;
-    */
 
+    xv25->stopLDS();
     xv25->setTestMode(testModeOff);
+}
+
+
+int main (void)
+{
+    XV25 *xv25 = new XV25(portName);
+
+    if (STATUS_ERROR == xv25->connect()) {
+        cerr << "Failed to connect to \"" << portName << "\"" << endl;
+	return -1;
+    }
+
+    getVersion(xv25);
 
     xv25->disconnect();
 
