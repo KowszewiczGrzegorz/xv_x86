@@ -114,6 +114,9 @@ void ropeAlgorithm (XV25 *xv25)
 
     xv25->getLDSScan(&scan);
 
+    xv25->stopLDS();
+    xv25->setTestMode(testModeOff);
+
     if (NULL != fp) {
         for (int i = 0; i < 359; i++) {
             if (0 < scan.distInMM[i] && scan.distInMM[i] < 1000.0) {
@@ -126,13 +129,16 @@ void ropeAlgorithm (XV25 *xv25)
         }
         fclose(fp);
     }
-    pl->setMaxDistanceRopeAlgorithm(50.0);
-    vector<line_t> lines = pl->ropeAlgorithm(points);
-    for (uint32_t i = 0; i < lines.size(); i++)
-        cerr << "Line " << i << " = " << lines[i].a << "*x + " << lines[i].b << "*y + " << lines[i].c << endl;
 
-    xv25->stopLDS();
-    xv25->setTestMode(testModeOff);
+    pl->setMaxDistanceRopeAlgorithm(50.0);
+
+    vector <vector<point_t> > clusters = pl->scanSegmentation(points, 50.0);
+    for (uint32_t i = 0; i < clusters.size(); i++) {
+        vector<line_t> lines = pl->ropeAlgorithm(clusters[i]);
+        cerr << "Cluster " << i << endl;
+        for (uint32_t i = 0; i < lines.size(); i++)
+            cerr << "   Line " << i << " = " << lines[i].a << "*x + " << lines[i].b << "*y + " << lines[i].c << endl;
+    }
 }
 
 

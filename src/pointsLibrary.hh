@@ -22,13 +22,16 @@ public:
     
     point_t p2c(int, int);
 
+    line_t linearRegression(vector<point_t> points);
+    vector <vector<point_t> > scanSegmentation(vector<point_t> points, double threshold);
+
     void setMaxDistanceRopeAlgorithm (double value) { m_maxDistanceRopeAlgorithm = value; };
     vector<line_t> ropeAlgorithm(vector<point_t>);
     vector<line_t> ropeAlgorithm(vector<point_t>, uint32_t, uint32_t, uint32_t);
 
 private:
     double distance2line(line_t, point_t);
-    line_t getLineEquation(point_t, point_t);
+    line_t getLineEquation(vector<point_t>, double);
     void crl(uint32_t);
     
     double m_maxDistanceRopeAlgorithm;
