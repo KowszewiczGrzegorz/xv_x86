@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include "xv25.hh"
 
-static const uint32_t bufferSize = 64;
+static const uint32_t bufferSize = 1024;
 
 
 XV25::XV25(string portName)
@@ -98,19 +98,21 @@ status_t XV25::sendMultiple(string cmd, bool needResponse)
 
     if (port > 0) {
         while (nbSent < cmd.size()) {
-            nbWrite = write(port, cmd.substr(nbSent, bufferSize-nbSent).c_str(), bufferSize);
+            nbWrite = write(port, cmd.substr(nbSent, bufferSize-nbSent).c_str(), 
+                            min((size_t)bufferSize, (cmd.substr(nbSent, bufferSize-nbSent).size())));
 
-            cerr << "    sent \"" << (cmd.substr(nbSent, nbWrite)) << "\"" << endl;
+            cerr << "    sent " << nbWrite << " bytes : \"" << (cmd.substr(nbSent, nbWrite-1)) << "\"" << endl;
 
             nbSent += nbWrite;
 
             do {
                 usleep(10);
-                nbRead = read(port, &bytes, bufferSize);
+                nbRead = read(port, &bytes, nbWrite);
 
-                cerr << "    read " << nbRead << " bytes << : \"" << bytes << "\"" << endl;
-            
-            } while (nbRead == -1 || nbWrite != nbRead || bytes[nbRead-1] != cmd[nbSent]);
+                if (-1 != nbRead)
+                    cerr << "    read " << nbRead << " bytes << : \"" << bytes << "\"" << endl;
+                
+            } while (nbRead == -1 || nbWrite != nbRead);
             bytes[0] = 0;
             usleep(10);
         }

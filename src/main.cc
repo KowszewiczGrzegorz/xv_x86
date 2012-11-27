@@ -151,7 +151,15 @@ int main (void)
 	return -1;
     }
 
-    getVersion(xv25);
+    xv25->setTestMode(testModeOn);
+    xv25->startLDS();
+    sleep(2);
+
+    ldsScan_t scan;
+    xv25->getLDSScan(&scan);
+
+    xv25->stopLDS();
+    xv25->setTestMode(testModeOff);
 
     xv25->disconnect();
 
