@@ -400,6 +400,17 @@ status_t XV25::getLDSScan(ldsScan_t *scan)
             }
             start += current + 1;
         } while (angle < 359);
+        
+        int subIndex = result.find_first_of("ROTATION_SPEED,");
+        string sub = result.substr(subIndex, result.size()-subIndex);
+
+        cerr << "Rotation line : \"" << sub << "\"" << endl;
+
+        sub = sub.substr(16, sub.size()-16);
+
+        cerr << "Rotation line (updated) : \"" << sub << "\"" << endl;
+
+        scan->rotationFrequency = atof(sub.c_str());
      }
     
     return ret;

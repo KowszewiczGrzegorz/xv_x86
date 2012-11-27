@@ -33,6 +33,7 @@ typedef struct {
     int distInMM[360];
     int intensity[360];
     int errorCode[360];
+    double rotationFrequency;
 } ldsScan_t;
 
 class XV25 {
