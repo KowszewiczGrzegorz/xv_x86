@@ -279,7 +279,7 @@ status_t XV25::setMotor(motor_t motor, int speed, int distance)
     return ret;
 }
 
-status_t XV25::setMotors(int lDist, int rDist, int speed)
+status_t XV25::setMotors(int lDist, int rDist, int speed, int acceleration)
 {
     status_t ret = STATUS_OK;;
     string cmd = "SetMotor ";
@@ -288,6 +288,7 @@ status_t XV25::setMotors(int lDist, int rDist, int speed)
     oss << " LWheelDist " << lDist;
     oss << " RWheelDist " << rDist; 
     oss << " Speed " << speed;
+    oss << " Accel " << acceleration;
     cmd += oss.str();
     ret = command(cmd);
 

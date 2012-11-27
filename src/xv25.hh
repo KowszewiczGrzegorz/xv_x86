@@ -47,7 +47,7 @@ public:
     status_t setTestMode(testMode_t);
 
     status_t setMotor(motor_t, int, int);
-    status_t setMotors(int, int, int);
+    status_t setMotors(int, int, int, int);
     status_t getPosition(motor_t, int*);
 
     status_t getBatteryLevel(int*);

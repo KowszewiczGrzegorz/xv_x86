@@ -60,27 +60,37 @@ void wallFollower(XV25 *xv25)
         lSpeed = 50 + (400.0 - dist)/3;
         rSpeed = 50 - (400.0 - dist)/3;
 
-        /*
-        double dist45 = xv25->getDistanceAtAngle(&scan, 45.0);
-        if (dist45 < dist60 && dist45 < 400) {
-            lSpeed = rSpeed = 20;
-        } else {
-            
-        }
-        */
-        /*
-        if (dist45 < 400.0) {
-            lSpeed += 400 - dist45;
-            rSpeed -= 400 - dist45;
-        }
-        */
+        cerr << "dist = " << dist << " => cmd motor = [" << lSpeed << ", " << rSpeed << "]" << endl;
+        xv25->setMotors(lSpeed, rSpeed, 30, 30);
+
+        t++;
+    }
+
+    xv25->stopLDS();
+    xv25->setTestMode(testModeOff);
+}
+
+void fastWallFollower(XV25 *xv25) 
+{
+    xv25->setTestMode(testModeOn);
+    sleep(1);
+
+    xv25->startLDS();
+    sleep(3);
+    
+    double lSpeed, rSpeed;
+    ldsScan_t scan;
+    int t = 0;
+    while (t < 500) {
+        xv25->getLDSScan(&scan);
+        
+        double dist = xv25->getDistanceAtAngle(&scan, 70);
+        lSpeed = 120 + (400.0 - dist)/3;
+        rSpeed = 120 - (400.0 - dist)/3;
 
         cerr << "dist = " << dist << " => cmd motor = [" << lSpeed << ", " << rSpeed << "]" << endl;
-        xv25->setMotors(lSpeed, rSpeed, 30);
-        // xv25->setMotor(leftWheel, lSpeed, 100);
-        // xv25->setMotor(rightWheel, rSpeed, 100);
+        xv25->setMotors(lSpeed, rSpeed, 100, 50);
 
-        // usleep(100);
         t++;
     }
 
