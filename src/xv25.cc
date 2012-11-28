@@ -58,7 +58,7 @@ status_t XV25::send(string cmd)
 
     while (-1 != read(port, &bytes, bufferSize))
         usleep(10);
-
+    
     if (port > 0) {
         while (nbSent < cmd.size()) {
             nbWrite = write(port, cmd.substr(nbSent, bufferSize-nbSent).c_str(), 
@@ -94,21 +94,26 @@ string XV25::receive(void)
         } while (-1 == nb);
         bytes[nb] = '\0';
         response += (char*)bytes;
+        for (int i = 0; i < nb && !gotEOF; i++)
+            if (0 == bytes[i] || 26 == bytes[i]) 
+                gotEOF = true;
+                
+        if (!gotEOF) {
+            do {
+                nb = read(port, &bytes, bufferSize-1);
 
-        do {
-            nb = read(port, &bytes, bufferSize-1);
+                if (nb >= 0) {
+                    usleep(1);
+                    for (int i = 0; i < nb && !gotEOF; i++)
+                        if (0 == bytes[i] || 26 == bytes[i])
+                            gotEOF = true;
+                    bytes[nb] = '\0';
+                    response += (char*)bytes;
+                } 
 
-            if (nb >= 0) {
-                usleep(1);
-                for (int i = 0; i < nb && !gotEOF; i++)
-                    if (0 == bytes[i] || 26 == bytes[i])
-                        gotEOF = true;
-                bytes[nb] = '\0';
-                response += (char*)bytes;
-            } 
+            } while (nb >= 0 || !gotEOF);
+        }
 
-        } while (nb >= 0 || !gotEOF);
-        
         if (!gotEOF) {
             for (uint32_t i = 0; i < 1000 && !gotEOF; i++) {
                 usleep(1);
@@ -193,7 +198,7 @@ status_t XV25::setMotors(int lDist, int rDist, int speed, int acceleration)
 status_t XV25::getPosition(motor_t motor, int* position)
 {
     status_t ret = STATUS_OK;
-    string cmd = "getMotor ";
+    string cmd = "GetMotors ";
     string result;
     
     switch (motor) {
@@ -201,7 +206,7 @@ status_t XV25::getPosition(motor_t motor, int* position)
         case rightWheel: cmd += "RightWheel"; break;
         default: ret = STATUS_ERROR;
     }
-    
+
     if (STATUS_OK == ret)
         ret = commandWithResponse(cmd, &result);
 
