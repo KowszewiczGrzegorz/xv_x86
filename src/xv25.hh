@@ -64,9 +64,7 @@ private:
     status_t commandWithResponse(string, string*);
 
     status_t send(string);
-    status_t sendMultiple(string);
     string receive();
-    string receiveMultiple(void);
  
     status_t getLDSMesure(string, int*, int*, int*, int*);
 

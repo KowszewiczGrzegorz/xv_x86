@@ -52,32 +52,6 @@ void XV25::disconnect()
 status_t XV25::send(string cmd)
 {
     status_t ret = STATUS_OK;
-    char byte;
-    int nb;
-
-    while (-1 != read(port, &byte, 1))
-        usleep(10);
-
-    if (port > 0) {
-        for (uint8_t i = 0; i < cmd.size(); i++) {
-            write(port, &cmd[i], 1);
-            do {
-                usleep(10);
-                nb = read(port, &byte, 1);
-            } while (nb == -1 || byte != cmd[i]);
-            byte = 0;
-            usleep(10);
-        }
-    } else {
-        ret = STATUS_ERROR;
-    }
-
-    return ret;
-}
-
-status_t XV25::sendMultiple(string cmd)
-{
-    status_t ret = STATUS_OK;
     char bytes[bufferSize];
     int nbWrite, nbRead;
     uint32_t nbSent = 0;
@@ -107,44 +81,6 @@ status_t XV25::sendMultiple(string cmd)
 }
 
 string XV25::receive(void)
-{
-    string response;
-    uint8_t byte;
-    int nb;
-    bool gotEOF = false;
-
-    if (0 < port) {
-        while (-1 == read(port, &byte, 1))
-            usleep(1);
-        response += (char)byte;
-
-        do {
-            nb = read(port, &byte, 1);
-
-            if (nb >= 0) {
-                usleep(1);
-                if (0 == byte)
-                    gotEOF = true;
-                else
-                    response += (char)byte;
-            } 
-
-        } while (nb >= 0);
-        
-        if (!gotEOF) {
-            for (uint32_t i = 0; i < 1000; i++) {
-                usleep(1);
-                read(port, &byte, 1);
-            }
-        }
-    } else {
-        cerr << "Failed to read from \"" << portName << "\"" << endl;
-    }
-
-    return response;
-}
-
-string XV25::receiveMultiple(void)
 {
     string response;
     uint8_t bytes[bufferSize];
@@ -190,15 +126,15 @@ string XV25::receiveMultiple(void)
 
 status_t XV25::command(string cmd)
 {
-    return sendMultiple(cmd+"\n");
+    return send(cmd+"\n");
 }
 
 status_t XV25::commandWithResponse(string cmd, string *response)
 {
     status_t ret = STATUS_OK;
 
-    if (STATUS_OK == sendMultiple(cmd+"\n"))
-    	*response = receiveMultiple();
+    if (STATUS_OK == send(cmd+"\n"))
+    	*response = receive();
     else
         ret = STATUS_ERROR;
     
