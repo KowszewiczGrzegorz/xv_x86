@@ -92,24 +92,42 @@ void fastWallFollower(XV25 *xv25)
     xv25->startLDS();
     sleep(3);
     
-    double lSpeed, rSpeed, dist;
+    double lSpeed, rSpeed, dist, dist2;
     ldsScan_t scan;
     timestamp_t t0, t1;
+    int lMotor, rMotor;
     while (!signalCatched) {
         t0 = get_timestamp();
         xv25->getLDSScan(&scan);
         
-        dist = xv25->getDistanceAtAngle(&scan, 70);
-        lSpeed = 120 + (400.0 - dist)/3;
-        rSpeed = 120 - (400.0 - dist)/3;
+        dist = xv25->getDistanceAtAngle(&scan, 90);
+        if (0 != dist) {
+            lSpeed = 100 + min((dist/fabs(dist))*70.0, (500.0 - dist)/3);
+            rSpeed = 100 - min((dist/fabs(dist))*70.0, (500.0 - dist)/3);
+        }
 
-        xv25->setMotors(lSpeed, rSpeed, 100, 50);
+        dist2 = xv25->getDistanceAtAngle(&scan, 45);
+        if (dist < 600 && dist2 < 800 && dist2 != 0) {
+            lSpeed += min(40.0, (800-dist2)/3);
+            rSpeed -= min(40.0, (800-dist2)/3);
+        }
+
+        if (dist2 < dist && dist2 != 0 && dist > 500) {
+            lSpeed = 100.0;
+            rSpeed = 100.0;
+        }
+
+        xv25->setMotors(lSpeed, rSpeed, 200, 100);
         t1 = get_timestamp();
 
-        cerr << "dist = " << dist << " => cmd motor = [" << lSpeed << ", ";
-        cerr << rSpeed << "] in " << ((t1-t0)/1000.0L) << "ms" << endl;
+        xv25->getPosition(leftWheel, &lMotor);
+        xv25->getPosition(rightWheel, &rMotor);
+
+        cerr << "dist = " << dist << ", dist2 = " << dist2 << " => cmd motor = [" << lSpeed << ", ";
+        cerr << rSpeed << "] in " << ((t1-t0)/1000.0L) << "ms";
+        cerr << " / position[" << lMotor << ", " << rMotor << "]" << endl;
         
-        while ((get_timestamp()-t0) < 300000.0L)
+        while ((get_timestamp()-t0) < 100000.0L)
             usleep(100);
     }
 
@@ -181,8 +199,12 @@ int main (void)
 	return -1;
     }
 
-    wallFollower(xv25);
-
+    fastWallFollower(xv25);
+    /*
+    int pos;
+    xv25->getPosition(leftWheel, &pos);
+    cerr << "LeftWheel position : " << pos << endl;
+    */
     xv25->disconnect();
 
     cerr << "End of program" << endl;
