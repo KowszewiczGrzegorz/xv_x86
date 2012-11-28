@@ -6,10 +6,8 @@
 
 static const string portName = "/dev/ttyACM0";
 
-
 typedef unsigned long long timestamp_t;
-static timestamp_t
-get_timestamp () {
+static timestamp_t get_timestamp () {
     struct timeval now;
     gettimeofday (&now, NULL);
     return  now.tv_usec + (timestamp_t)now.tv_sec * 1000000;
@@ -62,16 +60,20 @@ void wallFollower(XV25 *xv25)
     double lSpeed, rSpeed;
     ldsScan_t scan;
     int t = 0;
+    timestamp_t t0, t1;
     while (t < 500) {
+        t0 = get_timestamp();
         xv25->getLDSScan(&scan);
         
         double dist = xv25->getDistanceAtAngle(&scan, 70);
         lSpeed = 50 + (400.0 - dist)/3;
         rSpeed = 50 - (400.0 - dist)/3;
-
-        cerr << "dist = " << dist << " => cmd motor = [" << lSpeed << ", " << rSpeed << "]" << endl;
         xv25->setMotors(lSpeed, rSpeed, 30, 30);
+        t1 = get_timestamp();
 
+        cerr << "dist = " << dist << " => cmd motor = [" << lSpeed << ", ";
+        cerr << rSpeed << "] in " << ((t1-t0)/1000.0L) << "ms" << endl;
+        
         t++;
     }
 
@@ -90,15 +92,20 @@ void fastWallFollower(XV25 *xv25)
     double lSpeed, rSpeed;
     ldsScan_t scan;
     int t = 0;
+    timestamp_t t0, t1;
     while (t < 500) {
+        t0 = get_timestamp();
         xv25->getLDSScan(&scan);
         
         double dist = xv25->getDistanceAtAngle(&scan, 70);
         lSpeed = 120 + (400.0 - dist)/3;
         rSpeed = 120 - (400.0 - dist)/3;
 
-        cerr << "dist = " << dist << " => cmd motor = [" << lSpeed << ", " << rSpeed << "]" << endl;
         xv25->setMotors(lSpeed, rSpeed, 100, 50);
+        t1 = get_timestamp();
+
+        cerr << "dist = " << dist << " => cmd motor = [" << lSpeed << ", ";
+        cerr << rSpeed << "] in " << ((t1-t0)/1000.0L) << "ms" << endl;
 
         t++;
     }
@@ -160,21 +167,7 @@ int main (void)
 	return -1;
     }
 
-    xv25->setTestMode(testModeOn);
-    xv25->startLDS();
-    sleep(2);
-
-    ldsScan_t scan;
-    timestamp_t t0, t1;
-    for (int k = 0; k < 100; k++) {
-        t0 = get_timestamp();
-        xv25->getLDSScan(&scan);
-        t1 = get_timestamp();
-        cerr << "Scan " << k << " took " << ((t1-t0)/1000.0L) << "ms" << endl;
-    }
-
-    xv25->stopLDS();
-    xv25->setTestMode(testModeOff);
+    wallFollower(xv25);
 
     xv25->disconnect();
 
