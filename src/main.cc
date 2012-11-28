@@ -1,6 +1,7 @@
 #include <math.h>
 #include <sys/time.h>
 #include <stdint.h>
+#include <signal.h>
 #include "xv25.hh"
 #include "pointsLibrary.hh"
 
@@ -12,6 +13,8 @@ static timestamp_t get_timestamp () {
     gettimeofday (&now, NULL);
     return  now.tv_usec + (timestamp_t)now.tv_sec * 1000000;
 }
+
+static bool signalCatched = false;
 
 void getVersion(XV25 *xv25) 
 {
@@ -55,17 +58,16 @@ void wallFollower(XV25 *xv25)
     sleep(1);
 
     xv25->startLDS();
-    sleep(3);
+    sleep(2);
     
-    double lSpeed, rSpeed;
+    double lSpeed, rSpeed, dist;
     ldsScan_t scan;
-    int t = 0;
     timestamp_t t0, t1;
-    while (t < 500) {
+    while (!signalCatched) {
         t0 = get_timestamp();
         xv25->getLDSScan(&scan);
         
-        double dist = xv25->getDistanceAtAngle(&scan, 70);
+        dist = xv25->getDistanceAtAngle(&scan, 70);
         lSpeed = 50 + (400.0 - dist)/3;
         rSpeed = 50 - (400.0 - dist)/3;
         xv25->setMotors(lSpeed, rSpeed, 30, 30);
@@ -74,7 +76,8 @@ void wallFollower(XV25 *xv25)
         cerr << "dist = " << dist << " => cmd motor = [" << lSpeed << ", ";
         cerr << rSpeed << "] in " << ((t1-t0)/1000.0L) << "ms" << endl;
         
-        t++;
+        while ((get_timestamp()-t0) < 500000.0L)
+            usleep(100);
     }
 
     xv25->stopLDS();
@@ -89,15 +92,14 @@ void fastWallFollower(XV25 *xv25)
     xv25->startLDS();
     sleep(3);
     
-    double lSpeed, rSpeed;
+    double lSpeed, rSpeed, dist;
     ldsScan_t scan;
-    int t = 0;
     timestamp_t t0, t1;
-    while (t < 500) {
+    while (!signalCatched) {
         t0 = get_timestamp();
         xv25->getLDSScan(&scan);
         
-        double dist = xv25->getDistanceAtAngle(&scan, 70);
+        dist = xv25->getDistanceAtAngle(&scan, 70);
         lSpeed = 120 + (400.0 - dist)/3;
         rSpeed = 120 - (400.0 - dist)/3;
 
@@ -106,8 +108,9 @@ void fastWallFollower(XV25 *xv25)
 
         cerr << "dist = " << dist << " => cmd motor = [" << lSpeed << ", ";
         cerr << rSpeed << "] in " << ((t1-t0)/1000.0L) << "ms" << endl;
-
-        t++;
+        
+        while ((get_timestamp()-t0) < 300000.0L)
+            usleep(100);
     }
 
     xv25->stopLDS();
@@ -158,9 +161,20 @@ void ropeAlgorithm (XV25 *xv25)
 }
 
 
+void sighandler(int sig)
+{
+    cout << "Signal " << sig << " caught..." << endl;
+    signalCatched = true;
+}
+
+
 int main (void)
 {
     XV25 *xv25 = new XV25(portName);
+
+    signal(SIGABRT, &sighandler);
+    signal(SIGTERM, &sighandler);
+    signal(SIGINT, &sighandler);
 
     if (STATUS_ERROR == xv25->connect()) {
         cerr << "Failed to connect to \"" << portName << "\"" << endl;
