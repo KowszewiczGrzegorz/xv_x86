@@ -49,7 +49,7 @@ void XV25::disconnect()
         close(port);
 }
 
-status_t XV25::send(string cmd, bool needResponse)
+status_t XV25::send(string cmd)
 {
     status_t ret = STATUS_OK;
     char byte;
@@ -57,8 +57,6 @@ status_t XV25::send(string cmd, bool needResponse)
 
     while (-1 != read(port, &byte, 1))
         usleep(10);
-
-    cerr << "Sending command \"" << (cmd.substr(0, cmd.size()-2)) << "\"" << endl;
 
     if (port > 0) {
         for (uint8_t i = 0; i < cmd.size(); i++) {
@@ -70,13 +68,6 @@ status_t XV25::send(string cmd, bool needResponse)
             byte = 0;
             usleep(10);
         }
-        cerr << endl;
-
-        if (!needResponse) {
-            usleep(10);
-            while (-1 != read(port, &byte, 1) || 0 == byte)
-                usleep(10);
-        }
     } else {
         ret = STATUS_ERROR;
     }
@@ -84,7 +75,7 @@ status_t XV25::send(string cmd, bool needResponse)
     return ret;
 }
 
-status_t XV25::sendMultiple(string cmd, bool needResponse)
+status_t XV25::sendMultiple(string cmd)
 {
     status_t ret = STATUS_OK;
     char bytes[bufferSize];
@@ -94,37 +85,18 @@ status_t XV25::sendMultiple(string cmd, bool needResponse)
     while (-1 != read(port, &bytes, bufferSize))
         usleep(10);
 
-    cerr << "Sending command \"" << (cmd.substr(0, cmd.size()-2)) << "\"" << endl;
-
     if (port > 0) {
         while (nbSent < cmd.size()) {
             nbWrite = write(port, cmd.substr(nbSent, bufferSize-nbSent).c_str(), 
                             min((size_t)bufferSize, (cmd.substr(nbSent, bufferSize-nbSent).size())));
-
-            cerr << "    sent " << nbWrite << " bytes : \"" << (cmd.substr(nbSent, nbWrite-1)) << "\"" << endl;
 
             nbSent += nbWrite;
 
             do {
                 usleep(10);
                 nbRead = read(port, &bytes, nbWrite);
-
-                if (-1 != nbRead)
-                    cerr << "    read " << nbRead << " bytes << : \"" << bytes << "\"" << endl;
-                
             } while (nbRead == -1 || nbWrite != nbRead);
             bytes[0] = 0;
-            usleep(10);
-        }
-
-        if (!needResponse) {
-            usleep(10);
-            do {
-                nbRead = read(port, &bytes, 1);
-
-                cerr << "    read(flush) " << nbRead << " bytes << : \"" << bytes << "\"" << endl;
-
-            } while (-1 == nbRead || 0 == bytes[nbRead-1]);
             usleep(10);
         }
     } else {
@@ -169,12 +141,6 @@ string XV25::receive(void)
         cerr << "Failed to read from \"" << portName << "\"" << endl;
     }
 
-    /*
-    cerr << "Read ++++++++++++++++++" << endl;
-    cerr << response << endl;
-    cerr << "+++++++++++++++++++++++" << endl;
-    */
-
     return response;
 }
 
@@ -185,8 +151,6 @@ string XV25::receiveMultiple(void)
     int nb;
     bool gotEOF = false;
 
-    cerr << "ReceiveMultiple()" << endl;
-
     if (0 < port) {
         do {
             nb = read(port, &bytes, bufferSize);
@@ -195,22 +159,19 @@ string XV25::receiveMultiple(void)
         bytes[nb] = '\0';
         response += (char*)bytes;
 
-        cerr << "    received " << nb << " bytes : \"" << ((char*)bytes) << "\"" << endl;
-
         do {
             nb = read(port, &bytes, bufferSize-1);
 
             if (nb >= 0) {
                 usleep(1);
-                if (0 == bytes[nb-1])
-                    gotEOF = true;
+                for (int i = 0; i < nb && !gotEOF; i++)
+                    if (0 == bytes[i] || 26 == bytes[i])
+                        gotEOF = true;
                 bytes[nb] = '\0';
                 response += (char*)bytes;
-
-                cerr << "    received " << nb << " bytes : \"" << ((char*)bytes) << "\"" << endl;
             } 
 
-        } while (nb >= 0);
+        } while (nb >= 0 || !gotEOF);
         
         if (!gotEOF) {
             for (uint32_t i = 0; i < 1000 && !gotEOF; i++) {
@@ -224,23 +185,19 @@ string XV25::receiveMultiple(void)
         cerr << "Failed to read from \"" << portName << "\"" << endl;
     }
 
-    cerr << "Read ++++++++++++++++++" << endl;
-    cerr << response << endl;
-    cerr << "+++++++++++++++++++++++" << endl;
-
     return response;
 }
 
 status_t XV25::command(string cmd)
 {
-    return sendMultiple(cmd+"\r\n", false);
+    return sendMultiple(cmd+"\n");
 }
 
 status_t XV25::commandWithResponse(string cmd, string *response)
 {
     status_t ret = STATUS_OK;
 
-    if (STATUS_OK == sendMultiple(cmd+"\r\n", true))
+    if (STATUS_OK == sendMultiple(cmd+"\n"))
     	*response = receiveMultiple();
     else
         ret = STATUS_ERROR;
@@ -406,11 +363,11 @@ status_t XV25::getLDSScan(ldsScan_t *scan)
         int subIndex = result.find_first_of("ROTATION_SPEED,");
         string sub = result.substr(subIndex, result.size()-subIndex);
 
-        cerr << "Rotation line : \"" << sub << "\"" << endl;
+        //        cerr << "Rotation line : \"" << sub << "\"" << endl;
 
         sub = sub.substr(16, sub.size()-16);
 
-        cerr << "Rotation line (updated) : \"" << sub << "\"" << endl;
+        // cerr << "Rotation line (updated) : \"" << sub << "\"" << endl;
 
         scan->rotationFrequency = atof(sub.c_str());
      }

@@ -63,8 +63,8 @@ private:
     status_t command(string);
     status_t commandWithResponse(string, string*);
 
-    status_t send(string, bool);
-    status_t sendMultiple(string, bool);
+    status_t send(string);
+    status_t sendMultiple(string);
     string receive();
     string receiveMultiple(void);
  

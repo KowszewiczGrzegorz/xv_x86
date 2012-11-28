@@ -1,10 +1,19 @@
 #include <math.h>
+#include <sys/time.h>
 #include <stdint.h>
 #include "xv25.hh"
 #include "pointsLibrary.hh"
 
 static const string portName = "/dev/ttyACM0";
 
+
+typedef unsigned long long timestamp_t;
+static timestamp_t
+get_timestamp () {
+    struct timeval now;
+    gettimeofday (&now, NULL);
+    return  now.tv_usec + (timestamp_t)now.tv_sec * 1000000;
+}
 
 void getVersion(XV25 *xv25) 
 {
@@ -156,7 +165,13 @@ int main (void)
     sleep(2);
 
     ldsScan_t scan;
-    xv25->getLDSScan(&scan);
+    timestamp_t t0, t1;
+    for (int k = 0; k < 100; k++) {
+        t0 = get_timestamp();
+        xv25->getLDSScan(&scan);
+        t1 = get_timestamp();
+        cerr << "Scan " << k << " took " << ((t1-t0)/1000.0L) << "ms" << endl;
+    }
 
     xv25->stopLDS();
     xv25->setTestMode(testModeOff);
