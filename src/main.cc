@@ -244,11 +244,7 @@ int main (void)
     }
 
     fastWallFollower(xv25, odometry);
-    /*
-    int pos;
-    xv25->getPosition(leftWheel, &pos);
-    cerr << "LeftWheel position : " << pos << endl;
-    */
+
     xv25->disconnect();
 
     cerr << "End of program" << endl;
