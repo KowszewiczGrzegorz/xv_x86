@@ -91,11 +91,10 @@ void fastWallFollower(XV25 *xv25, Odometry *odometry)
 
     odometry->init();
     
-    double lSpeed, rSpeed, dist, dist2;
+    double lDist, rDist, dist, dist2;
     ldsScan_t scan;
     timestamp_t t0, t1;
     int lWheelDist, rWheelDist;
-    position_t pos;
 
     while (!signalCatched) {
         t0 = get_timestamp();
@@ -103,40 +102,79 @@ void fastWallFollower(XV25 *xv25, Odometry *odometry)
         
         dist = xv25->getDistanceAtAngle(&scan, 90);
         if (0 != dist) {
-            lSpeed = 100 + min((dist/fabs(dist))*70.0, (500.0 - dist)/3);
-            rSpeed = 100 - min((dist/fabs(dist))*70.0, (500.0 - dist)/3);
+            lDist = 100 + min((dist/fabs(dist))*70.0, (500.0 - dist)/3);
+            rDist = 100 - min((dist/fabs(dist))*70.0, (500.0 - dist)/3);
         }
 
         dist2 = xv25->getDistanceAtAngle(&scan, 45);
         if (dist < 600 && dist2 < 800 && dist2 != 0) {
-            lSpeed += min(40.0, (800-dist2)/3);
-            rSpeed -= min(40.0, (800-dist2)/3);
+            lDist += min(40.0, (800-dist2)/3);
+            rDist -= min(40.0, (800-dist2)/3);
         }
 
-        xv25->setMotors(lSpeed, rSpeed, 200, 100);
+        xv25->setMotors(lDist, rDist, 200, 100);
 
         xv25->getPositions(&lWheelDist, &rWheelDist);
         odometry->update(lWheelDist, rWheelDist);
 
         t1 = get_timestamp();
 
-        cerr << "dist = " << dist << ", dist2 = " << dist2 << " => cmd motor = [" << lSpeed << ", ";
-        cerr << rSpeed << "] in " << ((t1-t0)/1000.0L) << "ms";
-        pos = odometry->getCurrentPosition();
-        cerr << " in pos [" << pos.x << ", " << pos.y << ", " << pos.theta << "]" << endl;
+        cerr << "dist = " << dist << ", dist2 = " << dist2 << " => cmd motor = [" << lDist << ", ";
+        cerr << rDist << "] in " << ((t1-t0)/1000.0L) << "ms";
+        odometry->printPosition(" -- ");
         
         while ((get_timestamp()-t0) < 100000.0L) {
             usleep(1000);
             xv25->getPositions(&lWheelDist, &rWheelDist);
             odometry->update(lWheelDist, rWheelDist);
             cerr << ".";
-            // pos = odometry->getCurrentPosition();
-            // cerr << " in pos [" << pos.x << ", " << pos.y << ", " << pos.theta << "]" << endl;
         }
         cerr << endl;
     }
 
     xv25->stopLDS();
+    xv25->setTestMode(testModeOff);
+}
+
+void waitEndOfMovement (XV25* xv25, Odometry* odometry)
+{
+    int leftVel, rightVel;
+    int leftPos, rightPos;
+
+    do {
+        usleep(1000);
+        
+        // Update odometry
+        xv25->getPositions(&leftPos, &rightPos);
+        odometry->update(leftPos, rightPos);
+
+        xv25->getVelocities(&leftVel, &rightVel);
+    } while (0 != leftVel || 0 != rightVel);
+}
+
+void testOdometry (XV25* xv25, Odometry* odometry)
+{
+    xv25->setTestMode(testModeOn);
+    odometry->init();
+
+    odometry->printPosition("[INITIAL] ");
+
+    for (uint32_t i = 0; i < 4; i++) {
+        // straight line
+        xv25->setMotors(500, 500, 100, 100);
+        waitEndOfMovement(xv25, odometry);
+        
+        odometry->printPosition("[LINE] ");
+
+        // quarter turn
+        xv25->setMotors(190, -190, 100, 100);
+        waitEndOfMovement(xv25, odometry);
+
+        odometry->printPosition("[TURN/4] ");
+    }
+
+    odometry->printPosition("[END] ");
+
     xv25->setTestMode(testModeOff);
 }
 
