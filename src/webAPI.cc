@@ -1,8 +1,9 @@
 
 #include "webAPI.hh"
 
-WebAPI::WebAPI(int portNumber, XV25* xv25) {
+WebAPI::WebAPI(XV25* xv25, int portNumber) {
     m_xv25 = xv25;
+    m_status = STATUS_OK;
 
     m_sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (m_sockfd < 0) {
@@ -23,12 +24,6 @@ WebAPI::WebAPI(int portNumber, XV25* xv25) {
 
     listen(m_sockfd, 5);
     m_clilen = sizeof(m_cli_addr);
-    m_newsockfd = accept(m_sockfd, (struct sockaddr *) &m_cli_addr, &m_clilen);
-    if (m_newsockfd < 0) {
-        cerr << "ERROR on accept" << endl;
-        m_status = STATUS_ERROR;
-        return;
-    }
 }
 
 WebAPI::~WebAPI() {
@@ -38,28 +33,48 @@ WebAPI::~WebAPI() {
         close(m_sockfd);
 }
 
-void WebAPI::run() {
+void WebAPI::run(bool *signalCatched) {
     int n;
     string response;
+    
 
     if (STATUS_ERROR == m_status)
         return;
 
-    for (;;) {
-        bzero(m_buffer, 256);
-        n = read(m_newsockfd, m_buffer, 255);
-        if (n < 0) {
-            cerr << "ERROR reading from socket" << endl;
-        } else {
-            response = m_xv25->interpretCommand(m_buffer);
-            
-            if (response.size() > 0) {
-                n = write(m_newsockfd, response.c_str(), response.size());
-                if (n < 0) {
-                    cerr << "ERROR writing to socket" << endl;
-                }
+    for (; !*signalCatched;) {
+        cerr << "Waiting for new connection" << endl;
+        m_newsockfd = accept(m_sockfd, (struct sockaddr *) &m_cli_addr, &m_clilen);
+        if (m_newsockfd < 0) {
+            cerr << "ERROR on accept" << endl;
+            m_status = STATUS_ERROR;
+            return;
+        }
+
+        for (; !*signalCatched;) {
+            bzero(m_buffer, 256);
+            cerr << "Waiting for new command" << endl;
+            n = read(m_newsockfd, m_buffer, 255);
+            if (n < 0) {
+                cerr << "ERROR reading from socket" << endl;
+                close(m_newsockfd);
+                break;
             } else {
-                cerr << "no response needed" << endl;
+                if (n == 0)
+                    break;
+                m_buffer[n-1] = '\0';
+                response = m_xv25->interpretCommand(m_buffer);
+            
+                if (response.size() > 0) {
+                    cerr << "Writing response \"" << response << "\"" << endl;
+                    n = write(m_newsockfd, response.c_str(), response.size());
+                    if (n < 0) {
+                        cerr << "ERROR writing to socket" << endl;
+                        close(m_newsockfd);
+                        break;
+                    }
+                } else {
+                    cerr << "no response needed" << endl;
+                }
             }
         }
     }

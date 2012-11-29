@@ -10,10 +10,10 @@
 class WebAPI
 {
 public:
-    WebAPI(int, XV25*);
+    WebAPI(XV25*, int);
     ~WebAPI();
 
-    void run();
+    void run(bool*);
     status_t getStatus() { return m_status; };
 
 private:
