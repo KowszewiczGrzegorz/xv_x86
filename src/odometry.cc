@@ -41,3 +41,8 @@ void Odometry::update(double distLeftWheel, double distRightWheel)
     m_prevDistRightWheel = distRightWheel;
 }
 
+void Odometry::printPosition (string start)
+{
+    cerr << start << "current position [" << m_currentPosition.x << ", ";
+    cerr << m_currentPosition.y << ", " << m_currentPosition.theta << "]" << endl;
+}
