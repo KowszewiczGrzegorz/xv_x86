@@ -247,6 +247,32 @@ status_t XV25::getPositions(int* leftPos, int* rightPos)
     return ret;
 }
 
+status_t XV25::getVelocities(int* leftVel, int* rightVel)
+{
+    status_t ret = STATUS_OK;
+    string cmd = "GetMotors";
+    string result;
+
+    if (STATUS_OK == ret)
+        ret = commandWithResponse(cmd, &result);
+
+    if (STATUS_OK == ret) {
+        string tmp = "LeftWheel_Velocity,";
+        size_t pos = result.find(tmp);
+        pos += tmp.size();
+        size_t end = result.substr(pos).find('\n');
+        *leftVel = atoi(result.substr(pos, end).c_str());
+
+        tmp = "RightWheel_Velocity,";
+        pos = result.find(tmp);
+        pos += tmp.size();
+        end = result.substr(pos).find('\n');
+        *rightVel = atoi(result.substr(pos, end).c_str());
+    }
+
+    return ret;
+}
+
 status_t XV25::getBatteryLevel(int* battery)
 {
     status_t ret = STATUS_OK;
