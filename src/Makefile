@@ -1,8 +1,8 @@
 CC=g++
-CFLAGS=-W -Wall -Werror -lm
+CFLAGS=-W -Wall -Werror -lm -O3
 LDFLAGS=
 EXEC=xv25_test
-OBJECTS=main xv25 pointsLibrary odometry webAPI
+OBJECTS=main xv25 pointsLibrary odometry webAPI hash
 
 ARCH=x86
 TOPDIR=..
