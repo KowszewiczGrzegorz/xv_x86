@@ -4,7 +4,8 @@
     echo "<h2>Web API Test</h2>\n";
 
     /* Lit le port du service WWW. */
-    $service_port = getservbyname('www', 'tcp');
+    // $service_port = getservbyname('www', 'tcp');
+    $service_port = 8112
 
     /* Lit l'adresse IP du serveur de destination */
     $address = gethostbyname('127.0.0.1');
@@ -25,16 +26,14 @@
         echo "OK.\n";
     }
 
-    $in = "HEAD / HTTP/1.0\r\n\r\n";
-    $in .= "Host: www.example.com\r\n";
-    $in .= "Connection: Close\r\n\r\n";
-    $out = '';
+    $in = "GetVersion\n";
 
-    echo "Envoi de la requête HTTP HEAD...";
+    echo "Envoi de la requête '$in'\n";
     socket_write($socket, $in, strlen($in));
     echo "OK.\n";
 
-    echo "Lire la réponse : \n\n";
+    echo "Lire la réponse : \n";
+    $out = '';
     while ($out = socket_read($socket, 2048)) {
         echo $out;
     }
