@@ -407,38 +407,56 @@ string XV25::interpretCommand(string command)
 
     switch(hash(cmd.c_str())) {
         case GET_VERSION:
-            getVersion(&response);
+            response += "getVersion";
+            // getVersion(&response);
             break;
         case GET_BATTERY_LEVEL:
+            response += "getBatteryLevel";
+            /*
             int batteryLevel;
             getBatteryLevel(&batteryLevel);
             response += batteryLevel;
+            */
             break;
         case SET_TEST_MODE:
+            response += "setTestMode(" + parameters[0] + ")";
+            /*
             if (0 == parameters[0].compare("On"))
                 setTestMode(testModeOn);
             if (0 == parameters[0].compare("Off"))
                 setTestMode(testModeOff);
             break;
+            */
         case SET_MOTORS:
             if (4 == parameters.size()) {
+                response += "setMotors(" + parameters[0] + ", " + parameters[1] +
+                    + ", " + parameters[2] + ", " + parameters[3] + ")";
+                /*
                 int leftDist = atoi(parameters[0].c_str());
                 int rightDist = atoi(parameters[1].c_str());
                 int speed = atoi(parameters[2].c_str());
                 int accel = atoi(parameters[3].c_str());
                 setMotors(leftDist, rightDist, speed, accel);
+                */
+            } else {
+                cerr << "Wrong number of parameters for SetMotors !" << endl;
             }
             break;
         case GET_POSITIONS:
+            response += "getPositions";
+            /*
             int left, right;
             getPositions(&left, &right);
             response += left + " " + right;
+            */
             break;
         case START_LDS:
-            startLDS();
+            response += "startLDS";
+            // startLDS();
             break;
         case STOP_LDS:
-            stopLDS();
+            response += "stopLDS";
+            // stopLDS();
             break;
         default:;
     }
