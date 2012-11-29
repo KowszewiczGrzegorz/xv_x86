@@ -104,6 +104,8 @@ void fastWallFollower(XV25 *xv25, Odometry *odometry)
         if (0 != dist) {
             lDist = 100 + min((dist/fabs(dist))*70.0, (500.0 - dist)/3);
             rDist = 100 - min((dist/fabs(dist))*70.0, (500.0 - dist)/3);
+        } else {
+            lDist = rDist = 0;
         }
 
         dist2 = xv25->getDistanceAtAngle(&scan, 45);
@@ -232,12 +234,15 @@ void sighandler(int sig)
 int main (void)
 {
     XV25 *xv25 = new XV25(portName);
-    Odometry *odometry = new Odometry(300.0);
+    // Odometry *odometry = new Odometry(300.0);
 
     signal(SIGABRT, &sighandler);
     signal(SIGTERM, &sighandler);
     signal(SIGINT, &sighandler);
 
+    xv25->interpretCommand("GetVersion");
+
+#if 0
     if (STATUS_ERROR == xv25->connect()) {
         cerr << "Failed to connect to \"" << portName << "\"" << endl;
 	return -1;
@@ -246,6 +251,7 @@ int main (void)
     fastWallFollower(xv25, odometry);
 
     xv25->disconnect();
+#endif
 
     cerr << "End of program" << endl;
     
