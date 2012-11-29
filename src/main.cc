@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <signal.h>
 #include "xv25.hh"
+#include "webAPI.hh"
 #include "odometry.hh"
 #include "pointsLibrary.hh"
 
@@ -240,18 +241,18 @@ int main (void)
     signal(SIGTERM, &sighandler);
     signal(SIGINT, &sighandler);
 
-    xv25->interpretCommand("GetVersion");
-
-#if 0
+    /*
     if (STATUS_ERROR == xv25->connect()) {
         cerr << "Failed to connect to \"" << portName << "\"" << endl;
 	return -1;
     }
+    */
 
-    fastWallFollower(xv25, odometry);
+    WebAPI *webAPI = new WebAPI(xv25, 8112);
+    if (STATUS_OK == webAPI->getStatus())
+        webAPI->run(&signalCatched);
 
-    xv25->disconnect();
-#endif
+    // xv25->disconnect();
 
     cerr << "End of program" << endl;
     
