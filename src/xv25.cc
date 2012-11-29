@@ -221,6 +221,32 @@ status_t XV25::getPosition(motor_t motor, int* position)
     return ret;
 }
 
+status_t XV25::getPositions(int* leftPos, int* rightPos)
+{
+    status_t ret = STATUS_OK;
+    string cmd = "GetMotors";
+    string result;
+
+    if (STATUS_OK == ret)
+        ret = commandWithResponse(cmd, &result);
+
+    if (STATUS_OK == ret) {
+        string tmp = "LeftWheel_PositionInMM,";        
+        size_t pos = result.find(tmp);
+        pos += tmp.size();
+        size_t end = result.substr(pos).find('\n');
+        *leftPos = atoi(result.substr(pos, end).c_str());
+
+        tmp = "RightWheel_PositionInMM,";        
+        pos = result.find(tmp);
+        pos += tmp.size();
+        end = result.substr(pos).find('\n');
+        *rightPos = atoi(result.substr(pos, end).c_str());
+    }
+
+    return ret;
+}
+
 status_t XV25::getBatteryLevel(int* battery)
 {
     status_t ret = STATUS_OK;

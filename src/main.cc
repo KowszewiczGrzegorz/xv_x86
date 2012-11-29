@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <signal.h>
 #include "xv25.hh"
+#include "odometry.hh"
 #include "pointsLibrary.hh"
 
 static const string portName = "/dev/ttyACM0";
@@ -55,8 +56,6 @@ void getPosition(XV25 *xv25)
 void wallFollower(XV25 *xv25) 
 {
     xv25->setTestMode(testModeOn);
-    sleep(1);
-
     xv25->startLDS();
     sleep(2);
     
@@ -84,18 +83,20 @@ void wallFollower(XV25 *xv25)
     xv25->setTestMode(testModeOff);
 }
 
-void fastWallFollower(XV25 *xv25) 
+void fastWallFollower(XV25 *xv25, Odometry *odometry) 
 {
     xv25->setTestMode(testModeOn);
-    sleep(1);
-
     xv25->startLDS();
-    sleep(3);
+    sleep(2);
+
+    odometry->init();
     
     double lSpeed, rSpeed, dist, dist2;
     ldsScan_t scan;
     timestamp_t t0, t1;
-    int lMotor, rMotor;
+    int lWheelDist, rWheelDist;
+    position_t pos;
+
     while (!signalCatched) {
         t0 = get_timestamp();
         xv25->getLDSScan(&scan);
@@ -112,23 +113,27 @@ void fastWallFollower(XV25 *xv25)
             rSpeed -= min(40.0, (800-dist2)/3);
         }
 
-        if (dist2 < dist && dist2 != 0 && dist > 500) {
-            lSpeed = 100.0;
-            rSpeed = 100.0;
-        }
-
         xv25->setMotors(lSpeed, rSpeed, 200, 100);
-        t1 = get_timestamp();
 
-        xv25->getPosition(leftWheel, &lMotor);
-        xv25->getPosition(rightWheel, &rMotor);
+        xv25->getPositions(&lWheelDist, &rWheelDist);
+        odometry->update(lWheelDist, rWheelDist);
+
+        t1 = get_timestamp();
 
         cerr << "dist = " << dist << ", dist2 = " << dist2 << " => cmd motor = [" << lSpeed << ", ";
         cerr << rSpeed << "] in " << ((t1-t0)/1000.0L) << "ms";
-        cerr << " / position[" << lMotor << ", " << rMotor << "]" << endl;
+        pos = odometry->getCurrentPosition();
+        cerr << " in pos [" << pos.x << ", " << pos.y << ", " << pos.theta << "]" << endl;
         
-        while ((get_timestamp()-t0) < 100000.0L)
-            usleep(100);
+        while ((get_timestamp()-t0) < 100000.0L) {
+            usleep(1000);
+            xv25->getPositions(&lWheelDist, &rWheelDist);
+            odometry->update(lWheelDist, rWheelDist);
+            cerr << ".";
+            // pos = odometry->getCurrentPosition();
+            // cerr << " in pos [" << pos.x << ", " << pos.y << ", " << pos.theta << "]" << endl;
+        }
+        cerr << endl;
     }
 
     xv25->stopLDS();
@@ -189,6 +194,7 @@ void sighandler(int sig)
 int main (void)
 {
     XV25 *xv25 = new XV25(portName);
+    Odometry *odometry = new Odometry(300.0);
 
     signal(SIGABRT, &sighandler);
     signal(SIGTERM, &sighandler);
@@ -199,7 +205,7 @@ int main (void)
 	return -1;
     }
 
-    fastWallFollower(xv25);
+    fastWallFollower(xv25, odometry);
     /*
     int pos;
     xv25->getPosition(leftWheel, &pos);
