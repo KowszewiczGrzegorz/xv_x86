@@ -1,3 +1,6 @@
+<html>
+<head><title>Web API Test</title></head>
+<body>
 <?php
     error_reporting(E_ALL);
 
@@ -42,3 +45,5 @@
     socket_close($socket);
     echo "OK.\n\n";
 ?>
+</body>
+</html>
