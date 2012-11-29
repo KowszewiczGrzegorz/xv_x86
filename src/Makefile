@@ -1,7 +1,8 @@
 CC=g++
 CFLAGS=-W -Wall -Werror -lm -O3
 LDFLAGS=
-EXEC=xv25_test
+EXEC=xv25_test 
+EXEC2=webApiTest
 OBJECTS=main xv25 pointsLibrary odometry webAPI hash
 
 ARCH=x86
@@ -18,7 +19,7 @@ OBJS = $(OBJECTS:%=$(OBJDIR)/%.o)
 
 V=@
 
-all: $(BINDIR)/$(EXEC)
+all: $(BINDIR)/$(EXEC) $(BINDIR)/$(EXEC2)
 
 $(BINDIR)/$(EXEC): $(OBJS)
 	$(V)test -d $(BINDIR) || mkdir -p $(BINDIR)
@@ -29,6 +30,11 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cc
 	$(V)test -d $(OBJDIR) || mkdir -p $(OBJDIR)
 	$(V)printf "$(GREEN)[CXX]$(WHITE) $<\n"; 
 	$(V)$(CC) -c $< $(CFLAGS) -o $@
+
+$(BINDIR)/$(EXEC2): $(OBJDIR)/$(EXEC2).o
+	$(V)test -d $(BINDIR) || mkdir -p $(BINDIR)
+	$(V)printf "$(GREEN)[BIN]$(WHITE) $@ \n"; 
+	$(V)$(CC) -o $@ $^ $(LDFLAGS) 
 
 .PHONY: clean mrproper
 
