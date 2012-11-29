@@ -50,7 +50,7 @@ void WebAPI::run(bool *signalCatched) {
             return;
         }
 
-        for (; !*signalCatched;) {
+        //    for (; !*signalCatched;) {
             bzero(m_buffer, 256);
             cerr << "Waiting for new command" << endl;
             n = read(m_newsockfd, m_buffer, 255);
@@ -76,6 +76,7 @@ void WebAPI::run(bool *signalCatched) {
                     cerr << "no response needed" << endl;
                 }
             }
-        }
+            //}
+        close(m_newsockfd);
     }
 }

@@ -387,7 +387,7 @@ string XV25::interpretCommand(string command)
 {
     string cmd, response, tmp;
     vector<string> parameters;
-    uint32_t start, end;
+    unsigned long int start, end;
 
     if (string::npos != (end = command.find_first_of(' '))) {
         cmd = command.substr(0, end-1);
@@ -407,8 +407,10 @@ string XV25::interpretCommand(string command)
 
     switch(hash(cmd.c_str())) {
         case GET_VERSION:
-            response += "getVersion";
-            // getVersion(&response);
+            // response += "getVersion";
+            cerr << "This is a get version" << endl;
+            getVersion(&response);
+            cerr << "received from xv \"" << response << "\"" << endl;
             break;
         case GET_BATTERY_LEVEL:
             response += "getBatteryLevel";

@@ -248,10 +248,15 @@ int main (void)
     }
     */
 
-    WebAPI *webAPI = new WebAPI(xv25, 8112);
+    /*
+    WebAPI *webAPI = new WebAPI(xv25, 8116);
     if (STATUS_OK == webAPI->getStatus())
         webAPI->run(&signalCatched);
-
+    */
+    
+    string version;
+    xv25->getVersion(&version);
+    
     // xv25->disconnect();
 
     cerr << "End of program" << endl;
