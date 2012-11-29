@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <string.h>
 #include <stdint.h>
+#include "hash.hh"
 #include "xv25.hh"
 
 static const uint32_t bufferSize = 1024;
@@ -380,4 +381,67 @@ uint32_t XV25::getDistanceAtAngle (ldsScan_t* scan, uint32_t angle)
         cnt++;
     }
     return (average / cnt);    
+}
+
+string XV25::interpretCommand(string command)
+{
+    string cmd, response, tmp;
+    vector<string> parameters;
+    uint32_t start, end;
+
+    if (string::npos != (end = command.find_first_of(' '))) {
+        cmd = command.substr(0, end-1);
+        start = end+1;
+
+        do {
+            end = command.substr(start).find_first_of(' ');
+            if (string::npos != end)
+                tmp = command.substr(start, end-start);
+            else
+                tmp = command.substr(start);
+            parameters.push_back(tmp);
+        } while (string::npos != end);
+    } else {
+        cmd = command;
+    }
+
+    switch(hash(cmd.c_str())) {
+        case GET_VERSION:
+            getVersion(&response);
+            break;
+        case GET_BATTERY_LEVEL:
+            int batteryLevel;
+            getBatteryLevel(&batteryLevel);
+            response += batteryLevel;
+            break;
+        case SET_TEST_MODE:
+            if (0 == parameters[0].compare("On"))
+                setTestMode(testModeOn);
+            if (0 == parameters[0].compare("Off"))
+                setTestMode(testModeOff);
+            break;
+        case SET_MOTORS:
+            if (4 == parameters.size()) {
+                int leftDist = atoi(parameters[0].c_str());
+                int rightDist = atoi(parameters[1].c_str());
+                int speed = atoi(parameters[2].c_str());
+                int accel = atoi(parameters[3].c_str());
+                setMotors(leftDist, rightDist, speed, accel);
+            }
+            break;
+        case GET_POSITIONS:
+            int left, right;
+            getPositions(&left, &right);
+            response += left + " " + right;
+            break;
+        case START_LDS:
+            startLDS();
+            break;
+        case STOP_LDS:
+            stopLDS();
+            break;
+        default:;
+    }
+
+    return response;
 }

@@ -14,6 +14,15 @@ using namespace std;
 
 static const int STRING_SIZE = 64;
 
+/* Hash codes */
+static const uint32_t GET_VERSION = 1746928034U;
+static const uint32_t GET_BATTERY_LEVEL = 1971829418U;
+static const uint32_t SET_TEST_MODE = 3587361541U;
+static const uint32_t SET_MOTORS = 1037014863U;
+static const uint32_t GET_POSITIONS = 2247116388U;
+static const uint32_t START_LDS = 3406550930U;
+static const uint32_t STOP_LDS = 1882252425U;
+
 typedef enum {
     STATUS_OK,
     STATUS_ERROR
@@ -60,6 +69,8 @@ public:
     status_t getLDSScan(ldsScan_t*);
 
     uint32_t getDistanceAtAngle(ldsScan_t*, uint32_t);
+
+    string interpretCommand(string cmd);
 
 private:
     status_t command(string);
