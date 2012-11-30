@@ -50,33 +50,32 @@ void WebAPI::run(bool *signalCatched) {
             return;
         }
 
-        //    for (; !*signalCatched;) {
-            bzero(m_buffer, 256);
-            cerr << "Waiting for new command" << endl;
-            n = read(m_newsockfd, m_buffer, 255);
-            if (n < 0) {
-                cerr << "ERROR reading from socket" << endl;
-                close(m_newsockfd);
+        bzero(m_buffer, 256);
+        cerr << "Waiting for new command" << endl;
+        n = read(m_newsockfd, m_buffer, 255);
+        if (n < 0) {
+            cerr << "ERROR reading from socket" << endl;
+            close(m_newsockfd);
+            break;
+        } else {
+            if (n == 0)
                 break;
-            } else {
-                if (n == 0)
-                    break;
-                m_buffer[n-1] = '\0';
-                response = m_xv25->interpretCommand(m_buffer);
+            m_buffer[n-1] = '\0';
+            response = m_xv25->interpretCommand(m_buffer);
             
-                if (response.size() > 0) {
-                    cerr << "Writing response \"" << response << "\"" << endl;
-                    n = write(m_newsockfd, response.c_str(), response.size());
-                    if (n < 0) {
-                        cerr << "ERROR writing to socket" << endl;
-                        close(m_newsockfd);
-                        break;
-                    }
-                } else {
-                    cerr << "no response needed" << endl;
+            if (response.size() > 0) {
+                cerr << "Writing response \"" << response << "\"" << endl;
+                n = write(m_newsockfd, response.c_str(), response.size());
+                if (n < 0) {
+                    cerr << "ERROR writing to socket" << endl;
+                    close(m_newsockfd);
+                    break;
                 }
+            } else {
+                cerr << "no response needed" << endl;
             }
-            //}
+        }
+
         close(m_newsockfd);
     }
 }
