@@ -1,0 +1,81 @@
+<html>
+<head>
+    <title>Web interface for Neato XV-25</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script language="javascript" type="text/javascript">
+
+    nbCommandsInHistory = 2;
+    var commands = new Array();
+    commands[0] = "GetVersion";
+    commands[1] = "GetMotors";
+    commands[2] = "SetMotor 100 100 200 100";
+    commands[3] = "GetVersion";
+    commands[4] = "StartLDS";
+    commands[3] = "GetVersion";
+    commands[4] = "StopLDS";
+
+    function showMoreHistory(nb) {
+        i = 0;
+        while (i < nb && nbCommandsInHistory < commands.length) {
+            document.getElementById('historyList').innerHTML += "    <p class=\"history\"><a href=\"#\" onclick=\"document.getElementById('cmd').value='" 
+                                                                + commands[nbCommandsInHistory] + "';return false;\">" 
+                                                                + commands[nbCommandsInHistory] + "</a></p>\n";
+	    nbCommandsInHistory++;
+            i++;
+        }
+        if ( nbCommandsInHistory >= commands.length) {
+            document.getElementById('moreButtonDiv').innerHTML = "";
+        }
+    };
+</script>
+</head>
+<body>
+<h1>Web interface for Neato XV-25</h1>
+
+<img class="logo" src="xv-25.png" alt="neato XV-25" />
+
+<div class="form">
+    <h2>Commande</h2>
+    <form id="form_id" action="webAPIForm.php" method="post">
+        <input type="cmd" id="cmd" name="nom" maxlength="30" size="30" /> <input type="submit" value="OK">
+    </form>
+</div>
+
+<div class="form">
+    <h2>GetVersion</h2>
+    <p class="response">
+      Component,Major,Minor,Build<br/>
+      ModelID,0,XV11,<br/>
+      ConfigID,1,,<br/>
+      Serial Number,AAAnnnnnAA,0000000,D<br/>
+      Software,2,1,15499<br/>
+      BatteryType,1,NIMH_12CELL,<br/>
+      BlowerType,1,BLOWER_ORIG,<br/>
+      BrushSpeed,0,,<br/>
+      BrushMotorType,1,BRUSH_MOTOR_ORIG,<br/>
+      SideBrushType,1,SIDE_BRUSH_NONE,<br/>
+      WheelPodType,1,WHEEL_POD_ORIG,<br/>
+      DropSensorType,1,DROP_SENSOR_ORIG,<br/>
+      MagSensorType,1,MAG_SENSOR_ORIG,<br/>
+      WallSensorType,1,WALL_SENSOR_ORIG,<br/>
+      Locale,1,LOCALE_USA,<br/>
+      LDS Software,V1.0.0,,<br/>
+      LDS Serial,XXX-YYY,,<br/>
+      LDS CPU,F2802x/cd00,,<br/>
+      MainBoard Vendor ID,1,,<br/>
+      MainBoard Serial Number,99,,<br/>
+      MainBoard Version,15,0,<br/>
+      ChassisRev,-1,,<br/>
+      UIPanelRev,-1,,
+    </p>
+</div>
+
+<div class="form">
+    <h2>Historique</h2>
+    <div id="historyList">
+        <p class="history"><a href="#" onclick="document.getElementById('cmd').value='GetVersion';return false;">GetVersion</a></p>
+        <p class="history"><a href="#" onclick="document.getElementById('cmd').value='SetMotor';return false;">SetMotor</a></p>
+    </div>
+    <div class="centered" id="moreButtonDiv"><div id="moreButton"><a href="javascript:showMoreHistory(2)"/><< more >></a></div></div>
+</div>
+</body>

@@ -1,0 +1,85 @@
+.form {
+    border:1px solid #A9A9A9; 
+    padding:10px 20px 10px 20px;
+    margin:10px;
+    background-color:#D3D3D3;
+    margin-left: auto;
+    margin-right: auto;
+    width: 600;
+}
+
+.response {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 11px;
+    border:1px solid #A9A9A9; 
+    padding:10px 20px 10px 20px;
+    background-color:#B0B0B0;
+    text-align:left;
+    margin-left: auto;
+    margin-right: auto;
+    width: 90%;
+}
+
+.history {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 11px;
+    border:1px solid #A9A9A9; 
+    padding:5px 20px 5px 20px;
+    background-color:#B0B0B0;
+    text-align:left;
+    margin-left: auto;
+    margin-right: auto;
+    width: 90%;
+}
+
+.history a {
+    color: #000000;
+    text-decoration: none;
+}
+
+.history a:hover {
+    color: #000000;
+    text-decoration: underline;
+}
+
+h1 {
+    font-size:18px;
+    color:#606060;
+    text-align:center;
+}
+
+h2 {
+    font-size:16px;
+    color:#505050;
+    margin-left: 50px;
+}
+
+#form_id {
+    margin-left: 6px;
+}
+
+.logo {
+    float:right;
+    margin:5px;
+}
+
+.centered {
+    text-align: center;
+}
+
+#moreButton {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 11px;
+    border:1px solid #A9A9A9; 
+    padding:2px 2px 2px 2px;
+    background-color:#B0B0B0;
+    text-align: center;
+    width: 100px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#moreButton a{
+    color: #505050;
+    text-decoration: none;
+}
