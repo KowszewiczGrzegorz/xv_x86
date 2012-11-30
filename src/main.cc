@@ -237,9 +237,19 @@ int main (void)
     XV25 *xv25 = new XV25(portName);
     // Odometry *odometry = new Odometry(300.0);
 
+    // Signal stuff
+    struct sigaction act;
+    act.sa_handler = sighandler;
+    sigemptyset(&act.sa_mask);
+    act.sa_flags = 0;
+    sigaction(SIGINT, &act, 0);
+    sigaction(SIGABRT, &act, 0);
+    sigaction(SIGTERM, &act, 0);
+    /*
     signal(SIGABRT, &sighandler);
     signal(SIGTERM, &sighandler);
     signal(SIGINT, &sighandler);
+    */
 
     /*
     if (STATUS_ERROR == xv25->connect()) {
