@@ -73,6 +73,7 @@ public:
     string interpretCommand(string cmd);
 
 private:
+    status_t flush();
     status_t command(string);
     status_t commandWithResponse(string, string*);
 

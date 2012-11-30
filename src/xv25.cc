@@ -41,6 +41,8 @@ status_t XV25::connect()
         ret = STATUS_ERROR;
     }
 
+    flush();
+
     return ret;
 }
 
@@ -128,6 +130,18 @@ string XV25::receive(void)
     }
 
     return response;
+}
+
+status_t XV25::flush()
+{
+    status_t ret = STATUS_OK;
+
+    if (STATUS_OK == send("\n"))
+    	receive();
+    else
+        ret = STATUS_ERROR;
+    
+    return ret;
 }
 
 status_t XV25::command(string cmd)
