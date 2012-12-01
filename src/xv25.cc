@@ -136,11 +136,19 @@ status_t XV25::flush()
 {
     status_t ret = STATUS_OK;
 
-    if (STATUS_OK == send("\n"))
-    	receive();
-    else
+    if (STATUS_OK == send("\n")) {
+        uint8_t bytes[bufferSize];
+        int nb; 
+        usleep(500000);
+        do {
+            nb = read(port, &bytes, bufferSize);
+            usleep(1);
+        } while (-1 != nb);
+       
+    } else {
         ret = STATUS_ERROR;
-    
+    }
+
     return ret;
 }
 
