@@ -1,9 +1,9 @@
 <html>
 <head>
-    <title>Web interface for Neato XV-25</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <script language="javascript" type="text/javascript">
-        var commands = new Array();
+<title>Web interface for Neato XV-25</title>
+<link rel="stylesheet" type="text/css" href="style.css">
+     <script language="javascript" type="text/javascript">
+         var commands = new Array();
 <?php
 echo "        nbCommandsInHistory = 0;\n";
 $nbHistory = 0;
@@ -13,45 +13,71 @@ if (isset($_POST['cmd'])) {
     echo "        commands[0] = \"" . htmlspecialchars($_POST['cmd']) . "\";\n";
 }
 if (isset($_POST['history'])) {
-    // Slit post string and count
-    /*
-    if ($nb > 0) {
-        echo "nbCommandsInHistory += " .   . "\n";
-
-        for ($j = 0; $j < $nb; $j++)
-            echo "        commands[" . ($j+1) . "] = \"" . htmlspecialchars($_POST['history']) . "\";\n";
+    $historyList = explode (",",  htmlspecialchars($_POST['history']));
+    if (count($historyList) > 1) {
+        foreach ($historyList as $historyItem) {
+            if (strcmp($historyItem, "") != 0) {
+                if ($nbHistory <= 1)
+                    echo "        nbCommandsInHistory += 1;\n";
+                echo "        commands[" . $nbHistory . "] = \"" . $historyItem . "\";\n";
+                $nbHistory++;
+            }
+        }
     }
-    */
 }
-
 ?>
         function showMoreHistory(nb) {
             i = 0;
             while (i < nb && nbCommandsInHistory < commands.length) {
-                document.getElementById('historyList').innerHTML += "    <p class=\"history\">"
-                         + "<a href=\"#\" onclick=\"document.getElementById('cmd').value='" 
-                         + commands[nbCommandsInHistory] + "';return false;\">" 
-                         + commands[nbCommandsInHistory] + "</a></p>\n";
-	        nbCommandsInHistory++;
+                document.getElementById('historyList').innerHTML += "    <p class=\"square\" id=\"historyLine\">"
+                    + "<a href=\"#\" onclick=\"document.getElementById('cmd').value='"
+                    + commands[nbCommandsInHistory] + "';return false;\">"
+                    + commands[nbCommandsInHistory] + "</a></p>\n";
+                nbCommandsInHistory++;
                 i++;
             }
             if (nbCommandsInHistory >= commands.length) {
                 document.getElementById('moreButtonDiv').innerHTML = "";
-        }
-    };
-</script>
+            }
+       };
+
+       function toggleConnectionLog() {
+           var e = document.getElementById('connectionLog');
+           if (e.style.display == 'block')
+               e.style.display = 'none';
+           else
+               e.style.display = 'block';
+       };
+
+       function hideConnectionLog() {
+           document.getElementById('connectionLog').style.display = 'none';
+       };
+
+       function clearHistory() {
+           document.getElementById('history').value = "";
+           document.getElementById('moreButtonDiv').innerHTML = "";
+           document.getElementById('historyList').innerHTML = "";
+           document.getElementById('fullHistory').style.display = 'none';
+       };
+
+       window.onload = function() {
+           var cmd_input = document.getElementById ('cmd');
+           cmd_input.focus();
+           cmd_input.select();
+       }
+    </script>
 </head>
 <body>
 <h1>Web interface for Neato XV-25</h1>
 
 <img class="logo" src="xv-25.png" alt="neato XV-25" />
 
-<div class="form">
+    <div class="form">
     <h2>Commande</h2>
     <form id="form_id" action="webApiForm.php" method="post">
         <input type="cmd" id="cmd" name="cmd" maxlength="30" size="30" /> <input type="submit" value="OK">
 <?php
-$history = "";
+    $history = "";
 if (isset($_POST['history'])) {
     $history = htmlspecialchars($_POST['history']);
 }
@@ -66,83 +92,115 @@ echo "        <input type=\"hidden\" id=\"history\" name=\"history\" value=\"" .
 error_reporting(E_ALL);
 
 if (isset($_POST['cmd'])) {
-    echo "<div class=\"form\">\n";
-    echo "    <h2>" . htmlspecialchars($_POST['cmd']) . "</h2>\n";
-    echo "    <div class=\"response\">\n";
+    echo "<div class=\"form\" id=\"connectionLog\"style=\"cursor: pointer;\" onclick=\"hideConnectionLog()\" >\n";
+    echo "    <h2>Connection Log</h2>\n";
+    echo "    <div class=\"square\">\n";
 
     $service_port = 8112;
     $address = gethostbyname('127.0.0.1');
+    $error = 0;
 
-    echo "        Création du socket : <br/>\n";
-    if (!($socket = socket_create(AF_INET, SOCK_STREAM, 0))) {
-        echo "            socket_create() a échoué (erreur:" . socket_strerror(socket_last_error()) . ")<br/>\n";
-    } else {
-        echo "            OK.<br/>\n";
+    if (!($socket = socket_create(AF_INET, SOCK_STREAM, 0)))
+        $error = 1;
+    echo "        <p class=\"". ((0 == $error) ? "ok" : "ko") . "\">\n";
+    echo "        <b>Création du socket</b><br/>\n";
+    if (1 == $error)
+        echo "            --> socket_create() a échoué (erreur:" . socket_strerror(socket_last_error()) . ")\n";
+    else
+        echo "            --> OK.\n";
+    echo "        </p>\n";
+
+    if (0 == $error) {
+        if (!(socket_connect($socket, $address, $service_port)))
+            $error = 1;
+        echo "        <p class=\"". ((0 == $error) ? "ok" : "ko") . "\">\n";
+        echo "        <b>Essai de connexion à '" . $address . "' sur le port '" . $service_port . "'</b><br/>\n";
+        if (1 == $error)
+            echo "            --> socket_connect() a échoué (erreur:" . socket_strerror(socket_last_error($socket)) . ")\n";
+        else
+            echo "            --> OK.\n";
+        echo "        </p>\n";
     }
-    
-    echo "        Essai de connexion à '$address' sur le port '$service_port' : <br/>\n";
-    if (!(socket_connect($socket, $address, $service_port))) {
-        echo "            socket_connect() a échoué (erreur:" . socket_strerror(socket_last_error($socket)) . ")<br/>\n";
-    } else {
-        echo "            OK.<br/>\n";
+
+    if (0 == $error) {
+        $in = htmlspecialchars($_POST['cmd']) . "\n";
+        if (socket_write($socket ,$in ,strlen($in)) === false)
+            $error = 1;
+        echo "        <p class=\"". ((0 == $error) ? "ok" : "ko") . "\">\n";
+        echo "        <b>Envoi de la requête '" . htmlspecialchars($_POST['cmd']) . "\\n'</b><br/>\n";
+        if (1 == $error)
+            echo "            --> socket_write() a échoué (erreur:" . socket_strerror(socket_last_error($socket)) . ")\n";
+        else
+            echo "            --> OK.\n";
+        echo "        </p>\n";
     }
-    
-    $in = htmlspecialchars($_POST['cmd']) . "\n";
-    echo "        Envoi de la requête '" . htmlspecialchars($_POST['cmd']) . "\\n' : <br/>\n";
-    if (socket_write($socket ,$in ,strlen($in)) === false) {
-        echo "            socket_write() a échoué (erreur:" . socket_strerror(socket_last_error($socket)) . ")<br/>\n";
-    } else {
-        echo "            OK.<br/>\n";
-    }
-    
-    echo "        Lecture de la réponse : <br/>\n";
-    $out = '';
-    while (1) {
-        if(($out = socket_read($socket, 2048)) === false) {
-            echo "            socket_read() a échoué (erreur:" . socket_strerror(socket_last_error($socket)) . ")<br/>\n";
-            break;
-        } else {
-            echo $out;
+
+    if (0 == $error) {
+        $out = '';
+        while (0 == $error) {
+            if(($out = socket_read($socket, 2048)) === false) 
+                $error = 1;
         }
+        echo "        <p class=\"". ((0 == $error) ? "ok" : "ko") . "\">\n";
+        echo "        <b>Lecture de la réponse</b><br/>\n";
+        if (1 == $error)
+                echo "            --> socket_read() a échoué (erreur:" . socket_strerror(socket_last_error($socket)) . ")\n";
+        else
+            echo $out;
+        echo "        </p>\n";
     }
 
-    echo "        Fermeture du socket...<br/>\n";
+    echo "        <p class=\"ok\">\n";
+    echo "        <b>Fermeture du socket</b>\n";
     socket_close($socket);
-    echo "        OK.<br/>\n\n";
+    echo "        </p>\n";
     echo "    </div>\n";
-}
-?>
-</div>
+    echo "</div>\n\n";
 
-<?php
-  /*
-if (isset($_POST['response'])) {
     echo "<div class=\"form\">\n";
-    echo "<h2>" . htmlspecialchars($_POST['cmd_response']) . "</h2>\n";
-    echo "<p class=\"response\">\n";
-    echo "" . str_replace("\n", "<br/>\n", htmlspecialchars($_POST['response'])) . "\n";
-    echo "</p>\n":
+    echo "    <h2>" . htmlspecialchars($_POST['cmd']) . "</h2>  \n";
+    echo "    <div class=\"square\">\n";
+
+    if (0 == $error) {
+        echo str_replace("\n", "<br/>\n", htmlspecialchars($out)) . "\n";
+    } else {
+        echo "        Some error occured in the dialogue with the XV-25 ! <br/>\n";
+        echo "        <b>Check the <a href=\"#\" onclick=\"toggleConnectionLog()\">connection logs</a></b>\n";
+    }
+    echo "    </div>\n";
+    
+    echo "        <div class=\"moreButton historyButtons\" id=\"connectionLogButton\">\n";
+    echo "            <a href=\"#\" onclick=\"toggleConnectionLog()\"><< connection log >></a>\n";
+    echo "        </div>\n";
+
     echo "</div>\n";
 }
-  */
 ?>
 
 <?php
 if (isset($_POST['cmd']) || isset($_POST['history'])) {
-    echo "<div class=\"form\">\n";
+    echo "<div class=\"form\" id=\"fullHistory\">\n";
     echo "    <h2>Historique</h2>\n";
     echo "    <div id=\"historyList\">\n";
-    echo "        <p class=\"history\">\n";
-    echo "            <a href=\"#\" onclick=\"document.getElementById('cmd').value='" .  htmlspecialchars($_POST['cmd'])  . "';return false;\">GetVersion</a>\n";
+    echo "        <p class=\"square\" id=\"historyLine\">\n";
+    echo "            <a href=\"#\" onclick=\"document.getElementById('cmd').value='" . htmlspecialchars($_POST['cmd']) . "';return false;\">" . htmlspecialchars($_POST['cmd']) . "</a>\n";
     echo "        </p>\n";
-    echo "    </div>\n";
-    echo "    <div class=\"centered\" id=\"moreButtonDiv\">\n";
-    if (nbHistory > 1) {
-        echo "        <div id=\"moreButton\">\n";
-        echo "<a href=\"javascript:showMoreHistory(2)\"/><< more >></a>\n";
-        echo "        </div>\n";
+    if ($nbHistory > 1) {
+        echo "        <p class=\"square\" id=\"historyLine\">\n";
+        echo "            <a href=\"#\" onclick=\"document.getElementById('cmd').value='" . $historyList[0] . "';return false;\">" . $historyList[0] . "</a>\n";
+        echo "        </p>\n";
     }
     echo "    </div>\n";
+    echo "        <div id=\"moreButtonDiv\">\n";
+    if ($nbHistory > 2) {
+        echo "            <div class=\"moreButton historyButtons\">\n";
+        echo "                <a href=\"javascript:showMoreHistory(2)\"/><< more >></a>\n";
+        echo "            </div>\n";
+    }
+    echo "        </div>\n";
+    echo "        <div class=\"moreButton historyButtons\">\n";
+    echo "            <a href=\"javascript:clearHistory()\"/><< clear >></a>\n";
+    echo "        </div>\n";
     echo "</div>\n";
 }
 ?>

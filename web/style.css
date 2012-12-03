@@ -8,7 +8,7 @@
     width: 600;
 }
 
-.response {
+.square {
     font-family: "Courier New", Courier, monospace;
     font-size: 11px;
     border:1px solid #A9A9A9; 
@@ -20,26 +20,18 @@
     width: 90%;
 }
 
-.history {
-    font-family: "Courier New", Courier, monospace;
-    font-size: 11px;
-    border:1px solid #A9A9A9; 
-    padding:5px 20px 5px 20px;
-    background-color:#B0B0B0;
-    text-align:left;
-    margin-left: auto;
-    margin-right: auto;
-    width: 90%;
-}
-
-.history a {
+.square a {
     color: #000000;
     text-decoration: none;
 }
 
-.history a:hover {
+.square a:hover {
     color: #000000;
     text-decoration: underline;
+}
+
+#historyLine {
+    padding:2px 20px 2px 20px;
 }
 
 h1 {
@@ -67,19 +59,52 @@ h2 {
     text-align: center;
 }
 
-#moreButton {
+.moreButton {
     font-family: "Courier New", Courier, monospace;
     font-size: 11px;
     border:1px solid #A9A9A9; 
-    padding:2px 2px 2px 2px;
+    padding:2px 2px 2px 0px;
     background-color:#B0B0B0;
     text-align: center;
-    width: 100px;
-    margin-left: auto;
-    margin-right: auto;
+    width: 140px;
+    display:inline-block;
+    margin: 0 0 0 100px;
 }
 
-#moreButton a{
+.moreButton a{
     color: #505050;
     text-decoration: none;
+}
+
+div#moreButtonDiv {
+    display:inline-block;
+    text-align: center;
+}
+
+.historyButtons {
+    margin: auto;
+}
+
+#connectionLog {
+    display: none;
+    position: relative;
+    margin: 0 auto;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+p.ok {
+    border:1px solid #44FF44; 
+    background-color: #99FF99;
+    padding:2px 2px 2px 2px;
+}
+
+p.ko {
+    border:1px solid #CC0000; 
+    background-color:#FF8080;
+    padding:2px 2px 2px 2px;
+}
+
+#connectionLogButton {
+    margin-top: 10px;
 }
