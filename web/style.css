@@ -46,8 +46,17 @@ h2 {
     margin-left: 50px;
 }
 
+#ip {
+    text-align: center;
+}
+
+#port {
+    text-align: center;
+}
+
 #form_id {
     margin-left: 6px;
+    color:#505050;
 }
 
 .logo {

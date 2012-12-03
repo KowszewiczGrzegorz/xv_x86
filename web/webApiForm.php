@@ -72,10 +72,22 @@ if (isset($_POST['history'])) {
 
 <img class="logo" src="xv-25.png" alt="neato XV-25" />
 
-    <div class="form">
+<div class="form">
     <h2>Commande</h2>
     <form id="form_id" action="webApiForm.php" method="post">
-        <input type="cmd" id="cmd" name="cmd" maxlength="30" size="30" /> <input type="submit" value="OK">
+
+<?php
+    $ip = "127.0.0.1";
+    if (isset($_POST['ip']) && strcmp($_POST['ip'], "") != 0)
+        $ip = $_POST['ip'];
+    echo "        IP <input type=\"text\" id=\"ip\" name=\"ip\" maxlength=\"10\" size=\"10\" value=\"" . $ip . "\" />\n";
+    $port = 8112;
+    if (isset($_POST['port']) && strcmp($_POST['port'], "") != 0)
+        $port = $_POST['port'];
+    echo " port <input type=\"text\" id=\"port\" name=\"port\" maxlength=\"4\" size=\"4\" value=\"" . $port . "\" /><br/><br/>\n";
+?>
+        <input type="text" id="cmd" name="cmd" maxlength="30" size="30" /> 
+        <input type="submit" value="OK">
 <?php
     $history = "";
 if (isset($_POST['history'])) {
@@ -96,8 +108,8 @@ if (isset($_POST['cmd'])) {
     echo "    <h2>Connection Log</h2>\n";
     echo "    <div class=\"square\">\n";
 
-    $service_port = 8112;
-    $address = gethostbyname('127.0.0.1');
+    $service_port = $port;
+    $address = gethostbyname($ip);
     $error = 0;
 
     if (!($socket = socket_create(AF_INET, SOCK_STREAM, 0)))
@@ -136,9 +148,10 @@ if (isset($_POST['cmd'])) {
     }
 
     if (0 == $error) {
-        $out = '';
+        $out = "";
         while (0 == $error) {
-            if(($out = socket_read($socket, 2048)) === false) 
+            // if(($out = socket_read($socket, 2048)) === false) 
+            if (false === socket_recv($socket, $out, 10, MSG_DONTWAIT))
                 $error = 1;
         }
         echo "        <p class=\"". ((0 == $error) ? "ok" : "ko") . "\">\n";
