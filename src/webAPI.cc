@@ -61,21 +61,28 @@ void WebAPI::run(bool *signalCatched) {
             if (n == 0)
                 break;
             m_buffer[n-1] = '\0';
-            response = m_xv25->interpretCommand(m_buffer);
+            cerr << "Received command \"" << m_buffer << "\"" << endl;
+            // response = m_xv25->interpretCommand(m_buffer);
+            response = "XV25- response\nline 1\nline 2\0";
             
             if (response.size() > 0) {
-                cerr << "Writing response \"" << response << "\"" << endl;
+                sleep(1);
+                cerr << "Writing response \n\"" << response << "\"" << endl;
                 n = write(m_newsockfd, response.c_str(), response.size());
                 if (n < 0) {
                     cerr << "ERROR writing to socket" << endl;
                     close(m_newsockfd);
                     break;
                 }
+                cerr << "Wrote " << n << "chars " << endl;
+                n = write(m_newsockfd, "\0", 1);
+                cerr << "Wrote \"\\0\" " << endl;
             } else {
                 cerr << "no response needed" << endl;
             }
         }
 
+        cerr << "close(m_newsockfd);" << endl;
         close(m_newsockfd);
     }
 }

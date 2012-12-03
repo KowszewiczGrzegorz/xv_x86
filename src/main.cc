@@ -2,6 +2,7 @@
 #include <sys/time.h>
 #include <stdint.h>
 #include <signal.h>
+#include <stdlib.h>
 #include "xv25.hh"
 #include "webAPI.hh"
 #include "odometry.hh"
@@ -232,8 +233,9 @@ void sighandler(int sig)
 }
 
 
-int main (void)
+int main (int argc, char *argv[])
 {
+    int portNumber;
     XV25 *xv25 = new XV25(portName);
     // Odometry *odometry = new Odometry(300.0);
 
@@ -251,6 +253,8 @@ int main (void)
     signal(SIGINT, &sighandler);
     */
 
+
+
     /*
     if (STATUS_ERROR == xv25->connect()) {
         cerr << "Failed to connect to \"" << portName << "\"" << endl;
@@ -258,15 +262,20 @@ int main (void)
     }
     */
 
-    /*
-    WebAPI *webAPI = new WebAPI(xv25, 8116);
+    if (2 != argc) {
+        cerr << "Need 1 argument !" << endl;
+        return -1;
+    }
+    portNumber = atoi(argv[1]);
+    WebAPI *webAPI = new WebAPI(xv25, portNumber);
     if (STATUS_OK == webAPI->getStatus())
         webAPI->run(&signalCatched);
-    */
-    
+
+    /*    
     string version;
     xv25->getVersion(&version);
-    
+    */
+
     // xv25->disconnect();
 
     cerr << "End of program" << endl;
