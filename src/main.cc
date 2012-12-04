@@ -226,6 +226,14 @@ void ropeAlgorithm (XV25 *xv25)
 }
 
 
+void webTest(XV25* xv25, int portNumber)
+{
+    WebApi *webApi = new WebApi(xv25, portNumber);
+    if (STATUS_OK == webApi->getStatus())
+        webApi->run(&signalCatched);
+}
+
+
 void sighandler(int sig)
 {
     cout << "Signal " << sig << " caught..." << endl;
@@ -233,11 +241,10 @@ void sighandler(int sig)
 }
 
 
-int main (int argc, char *argv[])
+//int main (int argc, char *argv[])
+int main (void)
 {
-    int portNumber;
     XV25 *xv25 = new XV25(portName);
-    // Odometry *odometry = new Odometry(300.0);
 
     // Signal stuff
     struct sigaction act;
@@ -247,36 +254,28 @@ int main (int argc, char *argv[])
     sigaction(SIGINT, &act, 0);
     sigaction(SIGABRT, &act, 0);
     sigaction(SIGTERM, &act, 0);
-    /*
-    signal(SIGABRT, &sighandler);
-    signal(SIGTERM, &sighandler);
-    signal(SIGINT, &sighandler);
-    */
 
-
-
-    /*
     if (STATUS_ERROR == xv25->connect()) {
         cerr << "Failed to connect to \"" << portName << "\"" << endl;
 	return -1;
     }
-    */
 
+    /**** Web Test
     if (2 != argc) {
         cerr << "Need 1 argument !" << endl;
         return -1;
+    } else {
+        webtest(xv25, atoi(argv[1]));
     }
-    portNumber = atoi(argv[1]);
-    WebApi *webApi = new WebApi(xv25, portNumber);
-    if (STATUS_OK == webApi->getStatus())
-        webApi->run(&signalCatched);
-
-    /*    
-    string version;
-    xv25->getVersion(&version);
     */
 
-    // xv25->disconnect();
+    string version;
+    xv25->getVersion(&version);
+
+    Odometry *odometry = new Odometry(300.0);
+    testOdometry(xv25, odometry);
+
+    xv25->disconnect();
 
     cerr << "End of program" << endl;
     
