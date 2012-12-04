@@ -54,6 +54,10 @@ h2 {
     text-align: center;
 }
 
+#periode {
+    text-align: center;
+}
+
 #form_id {
     margin-left: 6px;
     color:#505050;
@@ -175,4 +179,16 @@ div#topnav ul li a:hover{
     text-align:left;
     margin-left: auto;
     margin-right: auto;
+}
+
+#xPos {
+    display:inline-block;
+}
+
+#yPos {
+    display:inline-block;
+}
+
+#thetaPos {
+    display:inline-block;
 }

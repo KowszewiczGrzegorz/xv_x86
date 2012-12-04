@@ -35,7 +35,7 @@
 
 <div id="topnav">
 <ul>
-    <li><a href="webApiForm.php">Commandes</a></li>
+    <li><a href="commandes.php">Commandes</a></li>
     <li><a href="ou-suis-je.php">Où suis-je ?</a></li>
     <li><a href="configuration.php">Configuration</a></li>
 </ul>

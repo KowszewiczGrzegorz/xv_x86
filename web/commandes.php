@@ -84,7 +84,7 @@ if (isset($_POST['history'])) {
 
 <div id="topnav">
 <ul>
-    <li><a href="webApiForm.php">Commandes</a></li>
+    <li><a href="commandes.php">Commandes</a></li>
     <li><a href="ou-suis-je.php">Où suis-je ?</a></li>
     <li><a href="configuration.php">Configuration</a></li>
 </ul>
@@ -103,7 +103,7 @@ if (isset($_POST['history'])) {
 
 <div class="form">
     <h2>Commande</h2>
-    <form id="form_id" action="webApiForm.php" method="post">
+    <form id="form_id" action="commandes.php" method="post">
         <input type="hidden" id="ip" name="ip" maxlength="10" size="10" value="" />
         <input type="hidden" id="port" name="port" maxlength="4" size="4" value="" />
         <input type="text" id="cmd" name="cmd" maxlength="30" size="30" /> 

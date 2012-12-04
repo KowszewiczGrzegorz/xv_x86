@@ -4,11 +4,8 @@
     <link rel="stylesheet" type="text/css" href="style.css">
     <script language="javascript" type="text/javascript" src="cookies.js"></script>
     <script language="javascript" type="text/javascript">
-     
-     window.onload = function() {
-         var canvas = document.getElementById("xv");
-         var context = canvas.getContext("2d");
 
+     function drawSquares(context) {
          context.strokeStyle = '#0099ff';
 
          context.beginPath();
@@ -21,13 +18,20 @@
              context.lineTo(500, y);
          }
          context.stroke();
+     }
 
-         var imageObj = new Image();
-         imageObj.onload = function() {
-             context.drawImage(imageObj, 225, 225);
-         };
-         imageObj.src = 'xv25-top.png';
+     var xv_x = 235, xv_y = 235;
+     var xv_t = 0;
+     var xvImage;
+     function drawXV(context) {
+         context.save();
+         context.translate(xv_x, xv_y);
+         context.rotate(xv_t);
+         context.drawImage(xvImage, 0, 0, 30, 30);
+         context.restore();
+     }
 
+     function drawScan(context) {
          context.strokeStyle = '#0000ff';
          for (x = 110; x < 390; x += 10) {
              deltaX = Math.floor(Math.random()*11) - 5;
@@ -38,6 +42,43 @@
              context.fillRect(x+deltaX,390-deltaY,2,2);
          }
      }
+
+     function refreshDrawing() {
+         var canvas = document.getElementById("xv");
+         var context = canvas.getContext("2d");
+         
+         xv_t += Math.PI/30.0;
+         xv_x += 6 * Math.sin(xv_t);
+         xv_y -= 6 * Math.cos(xv_t);
+
+         document.getElementById("xPos").innerHTML = Math.round(xv_x);
+         document.getElementById("yPos").innerHTML = Math.round(xv_y);
+         document.getElementById("thetaPos").innerHTML = ((Math.round(xv_t*100))/100);
+
+         context.clearRect(0, 0, canvas.width, canvas.height);
+         drawSquares(context);
+         drawXV(context);
+         drawScan(context);
+     }
+
+     var periodicFunction;
+     function updatePeriod() {
+         clearInterval(periodicFunction);
+         alert("submitting new period: " + document.getElementById("periode").value);
+         periodicFunction = setInterval(refreshDrawing, (document.getElementById("periode").value*1000));
+     }
+     
+     window.onload = function() {
+
+         xvImage = new Image();
+         xvImage.onload = function() {
+             context.drawImage(xvImage, xv_x, xv_y, 30, 30);
+         };
+         xvImage.src = 'xv25-top.png';
+
+         refreshDrawing();
+         periodicFunction = setInterval(refreshDrawing, (document.getElementById("periode").value*1000));
+     }
     </script>
 </head>
 <body>
@@ -45,7 +86,7 @@
 
 <div id="topnav">
 <ul>
-    <li><a href="webApiForm.php">Commandes</a></li>
+    <li><a href="commandes.php">Commandes</a></li>
     <li><a href="ou-suis-je.php">Où suis-je ?</a></li>
     <li><a href="configuration.php">Configuration</a></li>
 </ul>
@@ -54,9 +95,17 @@
 <div class="form">
     <h2>Où suis-je ?</h2>
     <div class="centered">
+
+        <div class="square" id="position">
+         Position XV-25 : <div id="xPos"></div> / <div id="yPos"></div> / <div id="thetaPos"></div>
+        </div>
         <canvas class="xv" id="xv" width="500" height="500">
             This text is displayed if your browser does not support HTML5 Canvas.
         </canvas>
+
+        <form id="form_id" action="ou-suis-je.php" method="post">
+            Période <input type="text" id="periode" name="periode" maxlength="5" size="5" value="1" onchange="updatePeriod()">
+        </form>
     </div>
 <?php
     $history = "";
