@@ -4,7 +4,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include "xv25.hh"
-#include "webAPI.hh"
+#include "webApi.hh"
 #include "odometry.hh"
 #include "pointsLibrary.hh"
 
@@ -267,9 +267,9 @@ int main (int argc, char *argv[])
         return -1;
     }
     portNumber = atoi(argv[1]);
-    WebAPI *webAPI = new WebAPI(xv25, portNumber);
-    if (STATUS_OK == webAPI->getStatus())
-        webAPI->run(&signalCatched);
+    WebApi *webApi = new WebApi(xv25, portNumber);
+    if (STATUS_OK == webApi->getStatus())
+        webApi->run(&signalCatched);
 
     /*    
     string version;
