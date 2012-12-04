@@ -149,17 +149,26 @@ if (isset($_POST['cmd'])) {
 
     if (0 == $error) {
         $out = "";
-        while (0 == $error) {
-            // if(($out = socket_read($socket, 2048)) === false) 
-            if (false === socket_recv($socket, $out, 10, MSG_DONTWAIT))
+        $response = "";
+        $receivedDone = 0;
+        while (0 == $receivedDone && 0 == $error) {
+            if (false === socket_recv($socket, $out, 1024, MSG_WAITALL)) {
                 $error = 1;
+            } else {
+                $response .= $out;
+                if (false !== ($endOfResponse = strpos($response, ",EndOfResponse"))) {
+                    $receivedDone = 1;
+                    $response = substr($response, 0, $endOfResponse);
+                    $response = str_replace("~", "<br/>", $response);
+                }
+            }
         }
         echo "        <p class=\"". ((0 == $error) ? "ok" : "ko") . "\">\n";
         echo "        <b>Lecture de la réponse</b><br/>\n";
         if (1 == $error)
                 echo "            --> socket_read() a échoué (erreur:" . socket_strerror(socket_last_error($socket)) . ")\n";
         else
-            echo $out;
+            echo "--> " . $response;
         echo "        </p>\n";
     }
 
@@ -175,7 +184,7 @@ if (isset($_POST['cmd'])) {
     echo "    <div class=\"square\">\n";
 
     if (0 == $error) {
-        echo str_replace("\n", "<br/>\n", htmlspecialchars($out)) . "\n";
+        echo $response;
     } else {
         echo "        Some error occured in the dialogue with the XV-25 ! <br/>\n";
         echo "        <b>Check the <a href=\"#\" onclick=\"toggleConnectionLog()\">connection logs</a></b>\n";

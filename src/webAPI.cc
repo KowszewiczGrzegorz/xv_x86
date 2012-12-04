@@ -63,7 +63,12 @@ void WebAPI::run(bool *signalCatched) {
             m_buffer[n-1] = '\0';
             cerr << "Received command \"" << m_buffer << "\"" << endl;
             // response = m_xv25->interpretCommand(m_buffer);
-            response = "XV25- response\nline 1\nline 2\0";
+            response = "XV25 response\nline 1\nline 2\n";
+
+            for (uint32_t k = 0; k < response.size(); k++)
+                if ('\n' == response[k])
+                    response[k] = '~';
+            response += ",EndOfResponse\n";
             
             if (response.size() > 0) {
                 sleep(1);
@@ -75,8 +80,6 @@ void WebAPI::run(bool *signalCatched) {
                     break;
                 }
                 cerr << "Wrote " << n << "chars " << endl;
-                n = write(m_newsockfd, "\0", 1);
-                cerr << "Wrote \"\\0\" " << endl;
             } else {
                 cerr << "no response needed" << endl;
             }
@@ -85,4 +88,5 @@ void WebAPI::run(bool *signalCatched) {
         cerr << "close(m_newsockfd);" << endl;
         close(m_newsockfd);
     }
+    close(m_sockfd);
 }
