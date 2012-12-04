@@ -1,83 +1,7 @@
 <html>
 <head>
-<title>Web interface for Neato XV-25 - Commandes</title>
+    <title>Web interface for Neato XV-25 - Où suis-je ?</title>
     <link rel="stylesheet" type="text/css" href="style.css">
-    <script language="javascript" type="text/javascript" src="cookies.js"></script>
-    <script language="javascript" type="text/javascript">
-         var commands = new Array();
-<?php
-echo "        nbCommandsInHistory = 0;\n";
-$nbHistory = 0;
-if (isset($_POST['cmd'])) {
-    $nbHistory += 1;
-    echo "        nbCommandsInHistory += 1;\n";
-    echo "        commands[0] = \"" . htmlspecialchars($_POST['cmd']) . "\";\n";
-}
-if (isset($_POST['history'])) {
-    $historyList = explode (",",  htmlspecialchars($_POST['history']));
-    if (count($historyList) > 1) {
-        foreach ($historyList as $historyItem) {
-            if (strcmp($historyItem, "") != 0) {
-                if ($nbHistory <= 1) 
-                    echo "        nbCommandsInHistory += 1;\n";
-                echo "        commands[" . $nbHistory . "] = \"" . $historyItem . "\";\n";
-                $nbHistory++;
-            }
-        }
-    }
-}
-?>
-        function showMoreHistory(nb) {
-            i = 0;
-            while (i < nb && nbCommandsInHistory < commands.length) {
-                document.getElementById('historyList').innerHTML += "    <p class=\"square\" id=\"historyLine\">"
-                    + "<a href=\"#\" onclick=\"document.getElementById('cmd').value='"
-                    + commands[nbCommandsInHistory] + "';return false;\">"
-                    + commands[nbCommandsInHistory] + "</a></p>\n";
-                nbCommandsInHistory++;
-                i++;
-            }
-            if (nbCommandsInHistory >= commands.length) {
-                document.getElementById('moreButtonDiv').innerHTML = "";
-            } else {
-                document.getElementById('moreButtonDiv').innerHTML = ""
-                    + "<div class=\"moreButton historyButtons\">\n"
-                    + "<a href=\"javascript:showMoreHistory(" + (nb+2) + ")\"/>"
-                    + "<< (" + (commands.length-nbCommandsInHistory) + ") more >></a>"
-                    + "</div>\n";
-            }
-       };
-
-       function toggleConnectionLog() {
-           var e = document.getElementById('connectionLog');
-           if (e.style.display == 'block')
-               e.style.display = 'none';
-           else
-               e.style.display = 'block';
-       };
-
-       function hideConnectionLog() {
-           document.getElementById('connectionLog').style.display = 'none';
-       };
-
-       function clearHistory() {
-           document.getElementById('history').value = "";
-           document.getElementById('moreButtonDiv').innerHTML = "";
-           document.getElementById('historyList').innerHTML = "";
-           document.getElementById('fullHistory').style.display = 'none';
-       };
-
-       function setCursor () {
-           var cmd_input = document.getElementById ('cmd');
-           cmd_input.focus();
-           cmd_input.select();
-       }
-
-       window.onload = function() {
-           setCursor();
-           getCookie();
-       }
-    </script>
 </head>
 <body>
 <h1>Web interface for Neato XV-25</h1>
@@ -92,22 +16,9 @@ if (isset($_POST['history'])) {
 
 <img class="logo" src="xv-25.png" alt="neato XV-25" />
 
-<?php
-    if ($_COOKIE['ipCookie'] == '' || $_COOKIE['portCookie'] == '') {
-        echo "<div class=\"warning\">\n";
-        echo "    La configuration de la connection n'a pas été faite !<br/>\n";
-        echo "    Allez sur la page <b><a href=\"configuration.php\">Configuration</a><b>\n";
-        echo "</div>\n";
-    }
-?>
-
 <div class="form">
-    <h2>Commande</h2>
-    <form id="form_id" action="webApiForm.php" method="post">
-        <input type="hidden" id="ip" name="ip" maxlength="10" size="10" value="" />
-        <input type="hidden" id="port" name="port" maxlength="4" size="4" value="" />
-        <input type="text" id="cmd" name="cmd" maxlength="30" size="30" /> 
-        <input type="submit" class="moreButton historyButtons" id="connectionLogButton" value="OK">
+    <h2>Où suis-je ?</h2>
+
 <?php
     $history = "";
 if (isset($_POST['history'])) {
@@ -127,9 +38,6 @@ if (isset($_POST['cmd'])) {
     echo "<div class=\"form\" id=\"connectionLog\"style=\"cursor: pointer;\" onclick=\"hideConnectionLog()\" >\n";
     echo "    <h2>Connection Log</h2>\n";
     echo "    <div class=\"square\">\n";
-
-    $ip = $_COOKIE['ipCookie'];
-    $port = $_COOKIE['portCookie'];
 
     $service_port = $port;
     $address = gethostbyname($ip);

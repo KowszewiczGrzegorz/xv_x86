@@ -116,3 +116,53 @@ p.ko {
 #connectionLogButton {
     margin-top: 10px;
 }
+
+div#topnav{
+    padding:4px;
+    text-align:center;
+    border-bottom:1px solid #A9A9A9;
+    border-top:1px solid #A9A9A9;
+}
+
+div#topnav ul{
+    list-style-type: none;
+    margin:0;
+    padding:0;
+}
+
+div#topnav ul li{
+    display:inline;
+    padding:4px;
+}
+
+div#topnav ul li a{
+    display:inline;
+    text-decoration: none;
+    padding:4px;
+    font-weight:bold;
+    color:#606060;
+}
+
+div#topnav ul li a:hover{
+    color:#FF4040;
+}
+
+.warning {
+    border:1px solid #CC0000; 
+    background-color:#FF8080;
+    padding:10px 20px 10px 20px;
+    margin:10px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 600;
+    color: #505050;
+}
+
+.warning a {
+    text-decoration: none;
+    color: #505050;
+}
+
+.warning a:hover {
+    color: yellow;
+}
