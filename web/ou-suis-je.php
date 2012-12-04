@@ -20,12 +20,13 @@
          context.stroke();
      }
 
-     var xv_x = 235, xv_y = 235;
+     var zeroOffset = 260;
+     var xv_x = 0, xv_y = 0;
      var xv_t = 0;
      var xvImage;
      function drawXV(context) {
          context.save();
-         context.translate(xv_x, xv_y);
+         context.translate(xv_x+zeroOffset, xv_y+zeroOffset);
          context.rotate(xv_t);
          context.drawImage(xvImage, 0, 0, 30, 30);
          context.restore();
@@ -48,7 +49,7 @@
          var context = canvas.getContext("2d");
 
          document.getElementById("xPos").innerHTML = Math.round(xv_x);
-         document.getElementById("yPos").innerHTML = Math.round(xv_y);
+         document.getElementById("yPos").innerHTML = Math.round(-xv_y);
          document.getElementById("thetaPos").innerHTML = ((Math.round(xv_t*100))/100);
 
          context.clearRect(0, 0, canvas.width, canvas.height);
@@ -57,6 +58,8 @@
          drawScan(context);
          
          xv_t += Math.PI/30.0;
+         if (xv_t > 2*Math.PI)
+             xv_t -= 2*Math.PI;
          xv_x += 6 * Math.sin(xv_t);
          xv_y -= 6 * Math.cos(xv_t);
      }
@@ -64,7 +67,6 @@
      var periodicFunction;
      function updatePeriod() {
          clearInterval(periodicFunction);
-         alert("submitting new period: " + document.getElementById("periode").value);
          periodicFunction = setInterval(refreshDrawing, (document.getElementById("periode").value*1000));
      }
      
@@ -101,11 +103,8 @@
         </div>
         <canvas class="xv" id="xv" width="550" height="550">
             This text is displayed if your browser does not support HTML5 Canvas.
-        </canvas>
-
-        <form id="form_id" action="ou-suis-je.php" method="post">
-            Période <input type="text" id="periode" name="periode" maxlength="5" size="5" value="1" onchange="updatePeriod()">
-        </form>
+        </canvas>      
+        Période <input type="text" id="periode" name="periode" maxlength="5" size="5" value="1" onchange="updatePeriod()">
     </div>
 <?php
     $history = "";
