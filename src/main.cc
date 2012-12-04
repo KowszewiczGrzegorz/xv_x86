@@ -241,8 +241,8 @@ void sighandler(int sig)
 }
 
 
-//int main (int argc, char *argv[])
-int main (void)
+int main (int argc, char *argv[])
+// int main (void)
 {
     XV25 *xv25 = new XV25(portName);
 
@@ -260,20 +260,20 @@ int main (void)
 	return -1;
     }
 
-    /**** Web Test
     if (2 != argc) {
         cerr << "Need 1 argument !" << endl;
         return -1;
     } else {
-        webtest(xv25, atoi(argv[1]));
+        webTest(xv25, atoi(argv[1]));
     }
-    */
 
+    /*
     string version;
     xv25->getVersion(&version);
 
     Odometry *odometry = new Odometry(300.0);
     testOdometry(xv25, odometry);
+    */
 
     xv25->disconnect();
 

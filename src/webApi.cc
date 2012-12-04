@@ -62,8 +62,8 @@ void WebApi::run(bool *signalCatched) {
                 break;
             m_buffer[n-1] = '\0';
             cerr << "Received command \"" << m_buffer << "\"" << endl;
-            // response = m_xv25->interpretCommand(m_buffer);
-            response = "XV25 response\nline 1\nline 2\n";
+            response = m_xv25->interpretCommand(m_buffer);
+            // response = "XV25 response\nline 1\nline 2\n";
 
             for (uint32_t k = 0; k < response.size(); k++)
                 if ('\n' == response[k])

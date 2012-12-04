@@ -427,6 +427,8 @@ string XV25::interpretCommand(string command)
         cmd = command;
     }
 
+    cerr << "interpret command (" << cmd << ") --> hash=\"" << hash(cmd.c_str()) << "\"" << endl;
+
     switch(hash(cmd.c_str())) {
         case GET_VERSION:
             // response += "getVersion";
