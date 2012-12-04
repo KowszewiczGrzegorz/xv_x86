@@ -17,7 +17,7 @@ if (isset($_POST['history'])) {
     if (count($historyList) > 1) {
         foreach ($historyList as $historyItem) {
             if (strcmp($historyItem, "") != 0) {
-                if ($nbHistory <= 1)
+                if ($nbHistory <= 1) 
                     echo "        nbCommandsInHistory += 1;\n";
                 echo "        commands[" . $nbHistory . "] = \"" . $historyItem . "\";\n";
                 $nbHistory++;
@@ -38,6 +38,12 @@ if (isset($_POST['history'])) {
             }
             if (nbCommandsInHistory >= commands.length) {
                 document.getElementById('moreButtonDiv').innerHTML = "";
+            } else {
+                document.getElementById('moreButtonDiv').innerHTML = ""
+                    + "<div class=\"moreButton historyButtons\">\n"
+                    + "<a href=\"javascript:showMoreHistory(" + (nb+2) + ")\"/>"
+                    + "<< (" + (commands.length-nbCommandsInHistory) + ") more >></a>"
+                    + "</div>\n";
             }
        };
 
@@ -216,7 +222,7 @@ if (isset($_POST['cmd']) || isset($_POST['history'])) {
     echo "        <div id=\"moreButtonDiv\">\n";
     if ($nbHistory > 2) {
         echo "            <div class=\"moreButton historyButtons\">\n";
-        echo "                <a href=\"javascript:showMoreHistory(2)\"/><< more >></a>\n";
+        echo "                <a href=\"javascript:showMoreHistory(2)\"/><< (". ($nbHistory-2) .") more >></a>\n";
         echo "            </div>\n";
     }
     echo "        </div>\n";
