@@ -31,7 +31,7 @@
     </script>
 </head>
 <body>
-<h1>Web interface for Neato XV-25 - Configuration</h1>
+<h1>Web interface for Neato XV-25</h1>
 
 <div id="topnav">
 <ul>

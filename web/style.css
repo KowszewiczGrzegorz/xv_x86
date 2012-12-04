@@ -166,3 +166,13 @@ div#topnav ul li a:hover{
 .warning a:hover {
     color: yellow;
 }
+
+.xv {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 11px;
+    border:1px solid #A9A9A9; 
+    background-color:white;
+    text-align:left;
+    margin-left: auto;
+    margin-right: auto;
+}

@@ -2,6 +2,43 @@
 <head>
     <title>Web interface for Neato XV-25 - Où suis-je ?</title>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <script language="javascript" type="text/javascript" src="cookies.js"></script>
+    <script language="javascript" type="text/javascript">
+     
+     window.onload = function() {
+         var canvas = document.getElementById("xv");
+         var context = canvas.getContext("2d");
+
+         context.strokeStyle = '#0099ff';
+
+         context.beginPath();
+         for (x = 50; x < 500; x += 50) {
+             context.moveTo(x, 0);
+             context.lineTo(x, 500);
+         }
+         for (y = 50; y < 500; y += 50) {
+             context.moveTo(0, y);
+             context.lineTo(500, y);
+         }
+         context.stroke();
+
+         var imageObj = new Image();
+         imageObj.onload = function() {
+             context.drawImage(imageObj, 225, 225);
+         };
+         imageObj.src = 'xv25-top.png';
+
+         context.strokeStyle = '#0000ff';
+         for (x = 110; x < 390; x += 10) {
+             deltaX = Math.floor(Math.random()*11) - 5;
+             deltaY = Math.floor(Math.random()*11) - 5;
+             context.fillRect(x+deltaX,110+deltaY,2,2);
+             context.fillRect(110+deltaX,x+deltaY,2,2);
+             context.fillRect(390-deltaX,x+deltaY,2,2);
+             context.fillRect(x+deltaX,390-deltaY,2,2);
+         }
+     }
+    </script>
 </head>
 <body>
 <h1>Web interface for Neato XV-25</h1>
@@ -14,11 +51,13 @@
 </ul>
 </div>
 
-<img class="logo" src="xv-25.png" alt="neato XV-25" />
-
 <div class="form">
     <h2>Où suis-je ?</h2>
-
+    <div class="centered">
+        <canvas class="xv" id="xv" width="500" height="500">
+            This text is displayed if your browser does not support HTML5 Canvas.
+        </canvas>
+    </div>
 <?php
     $history = "";
 if (isset($_POST['history'])) {
@@ -109,53 +148,8 @@ if (isset($_POST['cmd'])) {
     echo "        </p>\n";
     echo "    </div>\n";
     echo "</div>\n\n";
-
-    echo "<div class=\"form\">\n";
-    echo "    <h2>" . htmlspecialchars($_POST['cmd']) . "</h2>  \n";
-    echo "    <div class=\"square\">\n";
-
-    if (0 == $error) {
-        echo $response;
-    } else {
-        echo "        Some error occured in the dialogue with the XV-25 ! <br/>\n";
-        echo "        <b>Check the <a href=\"#\" onclick=\"toggleConnectionLog()\">connection logs</a></b>\n";
-    }
-    echo "    </div>\n";
-    
-    echo "        <div class=\"moreButton historyButtons\" id=\"connectionLogButton\">\n";
-    echo "            <a href=\"#\" onclick=\"toggleConnectionLog()\"><< connection log >></a>\n";
-    echo "        </div>\n";
-
-    echo "</div>\n";
 }
 ?>
 
-<?php
-if (isset($_POST['cmd']) || isset($_POST['history'])) {
-    echo "<div class=\"form\" id=\"fullHistory\">\n";
-    echo "    <h2>Historique</h2>\n";
-    echo "    <div id=\"historyList\">\n";
-    echo "        <p class=\"square\" id=\"historyLine\">\n";
-    echo "            <a href=\"#\" onclick=\"document.getElementById('cmd').value='" . htmlspecialchars($_POST['cmd']) . "';return false;\">" . htmlspecialchars($_POST['cmd']) . "</a>\n";
-    echo "        </p>\n";
-    if ($nbHistory > 1) {
-        echo "        <p class=\"square\" id=\"historyLine\">\n";
-        echo "            <a href=\"#\" onclick=\"document.getElementById('cmd').value='" . $historyList[0] . "';return false;\">" . $historyList[0] . "</a>\n";
-        echo "        </p>\n";
-    }
-    echo "    </div>\n";
-    echo "        <div id=\"moreButtonDiv\">\n";
-    if ($nbHistory > 2) {
-        echo "            <div class=\"moreButton historyButtons\">\n";
-        echo "                <a href=\"javascript:showMoreHistory(2)\"/><< (". ($nbHistory-2) .") more >></a>\n";
-        echo "            </div>\n";
-    }
-    echo "        </div>\n";
-    echo "        <div class=\"moreButton historyButtons\">\n";
-    echo "            <a href=\"javascript:clearHistory()\"/><< clear >></a>\n";
-    echo "        </div>\n";
-    echo "</div>\n";
-}
-?>
 </body>
 </html>
