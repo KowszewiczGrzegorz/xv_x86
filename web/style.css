@@ -192,3 +192,11 @@ div#topnav ul li a:hover{
 #thetaPos {
     display:inline-block;
 }
+
+#position {
+    margin-bottom: 10px;
+}
+
+#form_id {
+    margin-top: 5px;
+}

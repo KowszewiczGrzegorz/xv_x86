@@ -9,13 +9,13 @@
          context.strokeStyle = '#0099ff';
 
          context.beginPath();
-         for (x = 50; x < 500; x += 50) {
+         for (x = 50; x < 550; x += 50) {
              context.moveTo(x, 0);
-             context.lineTo(x, 500);
+             context.lineTo(x, 550);
          }
-         for (y = 50; y < 500; y += 50) {
+         for (y = 50; y < 550; y += 50) {
              context.moveTo(0, y);
-             context.lineTo(500, y);
+             context.lineTo(550, y);
          }
          context.stroke();
      }
@@ -33,23 +33,19 @@
 
      function drawScan(context) {
          context.strokeStyle = '#0000ff';
-         for (x = 110; x < 390; x += 10) {
+         for (x = 110; x < 440; x += 10) {
              deltaX = Math.floor(Math.random()*11) - 5;
              deltaY = Math.floor(Math.random()*11) - 5;
              context.fillRect(x+deltaX,110+deltaY,2,2);
              context.fillRect(110+deltaX,x+deltaY,2,2);
-             context.fillRect(390-deltaX,x+deltaY,2,2);
-             context.fillRect(x+deltaX,390-deltaY,2,2);
+             context.fillRect(440-deltaX,x+deltaY,2,2);
+             context.fillRect(x+deltaX,440-deltaY,2,2);
          }
      }
 
      function refreshDrawing() {
          var canvas = document.getElementById("xv");
          var context = canvas.getContext("2d");
-         
-         xv_t += Math.PI/30.0;
-         xv_x += 6 * Math.sin(xv_t);
-         xv_y -= 6 * Math.cos(xv_t);
 
          document.getElementById("xPos").innerHTML = Math.round(xv_x);
          document.getElementById("yPos").innerHTML = Math.round(xv_y);
@@ -59,6 +55,10 @@
          drawSquares(context);
          drawXV(context);
          drawScan(context);
+         
+         xv_t += Math.PI/30.0;
+         xv_x += 6 * Math.sin(xv_t);
+         xv_y -= 6 * Math.cos(xv_t);
      }
 
      var periodicFunction;
@@ -97,9 +97,9 @@
     <div class="centered">
 
         <div class="square" id="position">
-         Position XV-25 : <div id="xPos"></div> / <div id="yPos"></div> / <div id="thetaPos"></div>
+         <b>Position XV-25</b> : <div id="xPos"></div> / <div id="yPos"></div> / <div id="thetaPos"></div>
         </div>
-        <canvas class="xv" id="xv" width="500" height="500">
+        <canvas class="xv" id="xv" width="550" height="550">
             This text is displayed if your browser does not support HTML5 Canvas.
         </canvas>
 
