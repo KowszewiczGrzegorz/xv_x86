@@ -58,6 +58,10 @@ h2 {
     text-align: center;
 }
 
+#echelle {
+    text-align: center;
+}
+
 #form_id {
     margin-left: 6px;
     color:#505050;
@@ -199,4 +203,8 @@ div#topnav ul li a:hover{
 
 #form_id {
     margin-top: 5px;
+}
+
+.gray {
+    color:#505050;
 }
