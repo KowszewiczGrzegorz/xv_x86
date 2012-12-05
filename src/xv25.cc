@@ -161,10 +161,14 @@ status_t XV25::commandWithResponse(string cmd, string *response)
 {
     status_t ret = STATUS_OK;
 
+    // cerr << "Sending command : \"" << cmd << "\"" << endl;
+
     if (STATUS_OK == send(cmd+"\n"))
     	*response = receive();
     else
         ret = STATUS_ERROR;
+
+    // cerr << "  -> \"" << response << "\"" << endl;
     
     return ret;
 }
@@ -280,13 +284,13 @@ status_t XV25::getVelocities(int* leftVel, int* rightVel)
         ret = commandWithResponse(cmd, &result);
 
     if (STATUS_OK == ret) {
-        string tmp = "LeftWheel_Velocity,";
+        string tmp = "LeftWheel_Speed,";
         size_t pos = result.find(tmp);
         pos += tmp.size();
         size_t end = result.substr(pos).find('\n');
         *leftVel = atoi(result.substr(pos, end).c_str());
 
-        tmp = "RightWheel_Velocity,";
+        tmp = "RightWheel_Speed,";
         pos = result.find(tmp);
         pos += tmp.size();
         end = result.substr(pos).find('\n');
@@ -446,13 +450,11 @@ string XV25::interpretCommand(string command)
             break;
         case SET_TEST_MODE:
             response += "setTestMode(" + parameters[0] + ")";
-            /*
             if (0 == parameters[0].compare("On"))
                 setTestMode(testModeOn);
             if (0 == parameters[0].compare("Off"))
                 setTestMode(testModeOff);
             break;
-            */
         case SET_MOTORS:
             if (4 == parameters.size()) {
                 response += "setMotors(" + parameters[0] + ", " + parameters[1] +
@@ -470,11 +472,9 @@ string XV25::interpretCommand(string command)
             break;
         case GET_POSITIONS:
             response += "getPositions";
-            /*
             int left, right;
             getPositions(&left, &right);
-            response += left + " " + right;
-            */
+            response += left + "," + right;
             break;
         case START_LDS:
             response += "startLDS";
@@ -484,7 +484,10 @@ string XV25::interpretCommand(string command)
             response += "stopLDS";
             // stopLDS();
             break;
-        default:;
+        default:
+            cerr << "Command without abstraction layer" << endl;
+            commandWithResponse(command, &response);
+            break;
     }
 
     return response;

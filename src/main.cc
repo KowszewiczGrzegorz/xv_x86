@@ -146,7 +146,7 @@ void waitEndOfMovement (XV25* xv25, Odometry* odometry)
     int leftPos, rightPos;
 
     do {
-        usleep(1000);
+        usleep(1000000);
         
         // Update odometry
         xv25->getPositions(&leftPos, &rightPos);
@@ -241,8 +241,8 @@ void sighandler(int sig)
 }
 
 
-int main (int argc, char *argv[])
-// int main (void)
+//int main (int argc, char *argv[])
+int main (void)
 {
     XV25 *xv25 = new XV25(portName);
 
@@ -260,20 +260,20 @@ int main (int argc, char *argv[])
 	return -1;
     }
 
+    /*
     if (2 != argc) {
         cerr << "Need 1 argument !" << endl;
         return -1;
     } else {
         webTest(xv25, atoi(argv[1]));
     }
+    */
 
-    /*
     string version;
     xv25->getVersion(&version);
 
     Odometry *odometry = new Odometry(300.0);
     testOdometry(xv25, odometry);
-    */
 
     xv25->disconnect();
 
