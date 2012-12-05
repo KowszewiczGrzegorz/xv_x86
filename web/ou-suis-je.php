@@ -4,23 +4,32 @@
     <link rel="stylesheet" type="text/css" href="style.css">
     <script language="javascript" type="text/javascript" src="cookies.js"></script>
     <script language="javascript" type="text/javascript">
+     var canvas_size = 500;
+     var scale_m_per_square = 0.5;
 
      function drawSquares(context) {
+         context.beginPath();
          context.strokeStyle = '#0099ff';
+         for (x = 50; x < canvas_size; x += 50) {
+             context.moveTo(x, 0);
+             context.lineTo(x, canvas_size);
+         }
+         for (y = 50; y < canvas_size; y += 50) {
+             context.moveTo(0, y);
+             context.lineTo(canvas_size, y);
+         }
+         context.stroke();
 
          context.beginPath();
-         for (x = 50; x < 500; x += 50) {
-             context.moveTo(x, 0);
-             context.lineTo(x, 500);
-         }
-         for (y = 50; y < 500; y += 50) {
-             context.moveTo(0, y);
-             context.lineTo(500, y);
-         }
+         context.strokeStyle = '#ff1100';
+         context.moveTo(canvas_size/2 - 25, canvas_size/2);
+         context.lineTo(canvas_size/2 + 25, canvas_size/2);
+         context.moveTo(canvas_size/2, canvas_size/2 - 25);
+         context.lineTo(canvas_size/2, canvas_size/2 + 25);
          context.stroke();
      }
 
-     var zeroOffset = 250;
+     var zeroOffset = canvas_size / 2;
      var xv_x = 0, xv_y = 0;
      var xv_t = 0;
      var xvImage;
@@ -35,14 +44,45 @@
 
      function drawScan(context) {
          context.strokeStyle = '#0000ff';
-         for (x = 110; x < 390; x += 10) {
+         for (x = 110; x < (canvas_size-110); x += 10) {
              deltaX = Math.floor(Math.random()*11) - 5;
              deltaY = Math.floor(Math.random()*11) - 5;
              context.fillRect(x+deltaX,110+deltaY,2,2);
              context.fillRect(110+deltaX,x+deltaY,2,2);
-             context.fillRect(390-deltaX,x+deltaY,2,2);
-             context.fillRect(x+deltaX,390-deltaY,2,2);
+             context.fillRect(canvas_size-110-deltaX,x+deltaY,2,2);
+             context.fillRect(x+deltaX,canvas_size-110-deltaY,2,2);
          }
+     }
+
+     function drawScale(context) {
+         context.font = 'italic 12pt Calibri';
+         context.fillStyle = '#606060';
+         context.fillText('Échelle', 30, 30); 
+         text = '' + scale_m_per_square + ' m / graduation'
+         context.fillText(text, 365, 30);
+
+         context.beginPath();
+         context.rect(100, 20, 50/scale_m_per_square, 10);
+         context.strokeStyle = '#CC0000';
+         context.fillStyle = '#FF8080';
+         context.lineWidth = 1;
+         context.fill();
+         context.stroke();   
+
+         context.beginPath();
+         context.fillStyle = '#CC0000';
+         context.fillText('1m', 100+25/scale_m_per_square-10, 15); 
+         context.stroke();
+
+         context.beginPath();
+         context.strokeStyle = '#0099ff';        
+         context.moveTo(100, 25);
+         context.lineTo(350, 25);
+         for (x = 100; x < canvas_size-100; x += 50) {
+             context.moveTo(x, 10);
+             context.lineTo(x, 40);
+         }
+         context.stroke();       
      }
 
      function refreshDrawing() {
@@ -63,6 +103,11 @@
              xv_t -= 2*Math.PI;
          xv_x += 6 * Math.cos(xv_t);
          xv_y -= 6 * Math.sin(xv_t);
+
+         canvas = document.getElementById("xv-scale");
+         context = canvas.getContext("2d");
+         context.clearRect(0, 0, 500, 50);
+         drawScale(context);
      }
 
      var periodicFunction;
@@ -102,8 +147,9 @@
             HTML 5 is not supported by your browser. You need it to run this page !
         </canvas> 
         <br/>
-        <canvas class="xv-scale" id="xv-scale" width="500" height="50">
+        <canvas class="xv" id="xv-scale" width="500" height="50">
         </canvas>
+        <br/>
         Période <input type="text" id="periode" name="periode" maxlength="5" size="5" value="1" onchange="updatePeriod()">
     </div>
 <?php
