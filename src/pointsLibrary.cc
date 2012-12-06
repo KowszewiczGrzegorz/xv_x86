@@ -76,21 +76,32 @@ line_t PointsLibrary::linearRegression(vector<point_t> points)
 
 line_t PointsLibrary::getLineEquation(vector<point_t> points, double threshold)
 {
+    line_t l;
+    uint32_t nb;
+
+    /*
     point_t a = points[0];
     point_t b = points[points.size()-1];
-    line_t l;
 
     l.a = b.y - a.y;
     l.b = b.x - a.x;
     l.c = (a.x*b.y - b.x*a.x);
+    */
 
-    vector<point_t> linRegPoints;
-    for (uint32_t i = 0; i < points.size(); i++) 
-        if (distance2line(l, points[i]) < threshold)
-            linRegPoints.push_back(points[i]);
+    if (points.size() > 5) {
+        l = linearRegression(points);
+        nb = 0;
+
+        vector<point_t> linRegPoints;
+        for (uint32_t i = 0; i < points.size(); i++) 
+            if (distance2line(l, points[i]) < threshold) {
+                linRegPoints.push_back(points[i]);
+                nb++;
+            }
     
-    if (linRegPoints.size() > 5)
-        l = linearRegression(linRegPoints);
+        if (nb != points.size() && linRegPoints.size() > 5)
+            l = linearRegression(linRegPoints);
+    }
 
     return l;
 }
@@ -117,37 +128,37 @@ vector<line_t> PointsLibrary::ropeAlgorithm(vector<point_t> points, uint32_t sta
     double distance;
     double maxDistance = 0.0;
 
-    if (rl > 0)
+    if (rl > 0 || points.size() < 5)
         return lines;
     
     crl(rl); cerr << "ropeAlgorithm(points, " << start << ", " << end << ")" << endl;
 
     l = getLineEquation(points, m_maxDistanceRopeAlgorithm);
-    crl(rl); cerr << "line equation : " << l.a << "*x + " << l.b << "*y + " << l.c << endl;
+    // crl(rl); cerr << "line equation : " << l.a << "*x + " << l.b << "*y + " << l.c << endl;
     for (i = start+1; i < end-1; i++) {
         distance = distance2line(l, points[i]);
-        crl(rl); cerr << "[" << points[i].x << ", " << points[i].y << "] has distance = " << distance << endl;
+        // crl(rl); cerr << "[" << points[i].x << ", " << points[i].y << "] has distance = " << distance << endl;
         if (distance > maxDistance) {
             maxDistance = distance;
             maxDistanceIndex = i;
         }
     }
 
-    crl(rl); cerr << "got MaxDistance=" << maxDistance << " @  " << maxDistanceIndex << endl;
+    // crl(rl); cerr << "got MaxDistance=" << maxDistance << " @  " << maxDistanceIndex << endl;
              
     if (maxDistance > m_maxDistanceRopeAlgorithm) {
         vector<line_t> newLines;
         if (maxDistanceIndex-1-start > 3) {
-            crl(rl); cerr << "--- start recursion on [" << start << "," << (maxDistanceIndex-1) << "]" << endl;
+            // crl(rl); cerr << "--- start recursion on [" << start << "," << (maxDistanceIndex-1) << "]" << endl;
             lines = ropeAlgorithm(points, start, maxDistanceIndex-1, rl+1);
-            crl(rl); cerr << "--- end recursion on [" << start << "," << (maxDistanceIndex-1) << "]" << endl;
+            // crl(rl); cerr << "--- end recursion on [" << start << "," << (maxDistanceIndex-1) << "]" << endl;
         } else {
-            crl(rl); cerr << "no recurion on [" << start << "," << (maxDistanceIndex-1) << "]" << endl;
+            // crl(rl); cerr << "no recurion on [" << start << "," << (maxDistanceIndex-1) << "]" << endl;
         }
         if (end-maxDistanceIndex-1 > 3) {
-            crl(rl); cerr << "--- start recursion on [" << (maxDistanceIndex+1) << "," << end << "]" << endl;
+            // crl(rl); cerr << "--- start recursion on [" << (maxDistanceIndex+1) << "," << end << "]" << endl;
             newLines = ropeAlgorithm(points, maxDistanceIndex+1, end, rl+1);
-            crl(rl); cerr << "--- end recursion on [" << (maxDistanceIndex+1) << "," << end << "]" << endl;
+            // crl(rl); cerr << "--- end recursion on [" << (maxDistanceIndex+1) << "," << end << "]" << endl;
             lines.insert(lines.end(), newLines.begin(), newLines.end());
         } 
     } else {
