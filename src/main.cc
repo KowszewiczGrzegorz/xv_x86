@@ -152,7 +152,7 @@ void waitEndOfMovement (XV25* xv25, Odometry* odometry)
         xv25->getPositions(&leftPos, &rightPos);
         odometry->update(leftPos, rightPos);
 
-        usleep(100);
+        usleep(1000);
         xv25->getVelocities(&leftVel, &rightVel);
     } while (0 != leftVel || 0 != rightVel);
 }
