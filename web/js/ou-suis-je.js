@@ -1,5 +1,5 @@
 var canvas_size = 500;
-var scale_m_size = 50;
+var scale_m_size = 200;
 var center_x = canvas_size/2;
 var center_y = canvas_size/2;
 var xv_x_mm = 0, xv_y_mm = 0;
@@ -126,7 +126,7 @@ function refreshDrawing() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     drawSquares(context);
     drawXV(context);
-    drawScan(context);
+//    drawScan(context);
 
     canvas = document.getElementById("xv-scale");
     context = canvas.getContext("2d");

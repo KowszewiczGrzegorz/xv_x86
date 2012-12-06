@@ -52,7 +52,7 @@
         <br/>
          Période <input type="text" id="periode" name="periode" maxlength="5" size="5" value="1" onchange="updatePeriod()"> (en sec)
          &nbsp;&nbsp;&nbsp;&nbsp;---&nbsp;&nbsp;&nbsp;&nbsp;
-Échelle <input type="text" id="echelle" name="echelle" maxlength="5" size="5" value="50" onchange="updateScale()"> (en pixels/m)
+Échelle <input type="text" id="echelle" name="echelle" maxlength="5" size="5" value="100" onchange="updateScale()"> (en pixels/m)
     </div>
 <?php
     $history = "";
