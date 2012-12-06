@@ -27,6 +27,15 @@
 </ul>
 </div>
 
+<?php
+    if ($_COOKIE['ipCookie'] == '' || $_COOKIE['portCookie'] == '') {
+        echo "<div class=\"warning\">\n";
+        echo "    La configuration de la connection n'a pas été faite !<br/>\n";
+        echo "    Allez sur la page <b><a href=\"configuration.php\">Configuration</a><b>\n";
+        echo "</div>\n";
+    }
+?>
+
 <div class="form">
     <h2>Où suis-je ?</h2>
     <div class="centered gray">
@@ -56,87 +65,6 @@ echo "        <input type=\"hidden\" id=\"history\" name=\"history\" value=\"" .
 ?>
     </form>
 </div>
-
-<?php
-error_reporting(E_ALL);
-
-if (isset($_POST['cmd'])) {
-    echo "<div class=\"form\" id=\"connectionLog\"style=\"cursor: pointer;\" onclick=\"hideConnectionLog()\" >\n";
-    echo "    <h2>Connection Log</h2>\n";
-    echo "    <div class=\"square\">\n";
-
-    $service_port = $port;
-    $address = gethostbyname($ip);
-    $error = 0;
-
-    if (!($socket = socket_create(AF_INET, SOCK_STREAM, 0)))
-        $error = 1;
-    echo "        <p class=\"". ((0 == $error) ? "ok" : "ko") . "\">\n";
-    echo "        <b>Création du socket</b><br/>\n";
-    if (1 == $error)
-        echo "            --> socket_create() a échoué (erreur:" . socket_strerror(socket_last_error()) . ")\n";
-    else
-        echo "            --> OK.\n";
-    echo "        </p>\n";
-
-    if (0 == $error) {
-        if (!(socket_connect($socket, $address, $service_port)))
-            $error = 1;
-        echo "        <p class=\"". ((0 == $error) ? "ok" : "ko") . "\">\n";
-        echo "        <b>Essai de connexion à '" . $address . "' sur le port '" . $service_port . "'</b><br/>\n";
-        if (1 == $error)
-            echo "            --> socket_connect() a échoué (erreur:" . socket_strerror(socket_last_error($socket)) . ")\n";
-        else
-            echo "            --> OK.\n";
-        echo "        </p>\n";
-    }
-
-    if (0 == $error) {
-        $in = htmlspecialchars($_POST['cmd']) . "\n";
-        if (socket_write($socket ,$in ,strlen($in)) === false)
-            $error = 1;
-        echo "        <p class=\"". ((0 == $error) ? "ok" : "ko") . "\">\n";
-        echo "        <b>Envoi de la requête '" . htmlspecialchars($_POST['cmd']) . "\\n'</b><br/>\n";
-        if (1 == $error)
-            echo "            --> socket_write() a échoué (erreur:" . socket_strerror(socket_last_error($socket)) . ")\n";
-        else
-            echo "            --> OK.\n";
-        echo "        </p>\n";
-    }
-
-    if (0 == $error) {
-        $out = "";
-        $response = "";
-        $receivedDone = 0;
-        while (0 == $receivedDone && 0 == $error) {
-            if (false === socket_recv($socket, $out, 1024, MSG_WAITALL)) {
-                $error = 1;
-            } else {
-                $response .= $out;
-                if (false !== ($endOfResponse = strpos($response, ",EndOfResponse"))) {
-                    $receivedDone = 1;
-                    $response = substr($response, 0, $endOfResponse);
-                    $response = str_replace("~", "<br/>", $response);
-                }
-            }
-        }
-        echo "        <p class=\"". ((0 == $error) ? "ok" : "ko") . "\">\n";
-        echo "        <b>Lecture de la réponse</b><br/>\n";
-        if (1 == $error)
-                echo "            --> socket_read() a échoué (erreur:" . socket_strerror(socket_last_error($socket)) . ")\n";
-        else
-            echo "--> " . $response;
-        echo "        </p>\n";
-    }
-
-    echo "        <p class=\"ok\">\n";
-    echo "        <b>Fermeture du socket</b>\n";
-    socket_close($socket);
-    echo "        </p>\n";
-    echo "    </div>\n";
-    echo "</div>\n\n";
-}
-?>
 
 </body>
 </html>

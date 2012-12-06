@@ -1,4 +1,4 @@
-var scan;
+var scan = new Array();
 
 function demande_scan()
 {
@@ -10,9 +10,17 @@ function demande_scan()
         xhr = new ActiveXObject("Microsoft.XMLHTTP");
     }
 
-    xhr.open("GET", "scan.txt", false);
+    xhr.onreadystatechange = function() { reception_scan(xhr); };
+
+    xhr.open("GET", "getScan.php", false);
     xhr.send(null);
-    
-    scan = xhr.responseText;
 }
 
+function reception_scan(xhr)
+{    
+    var docXML= xhr.responseXML;
+    var items = docXML.getElementsByTagName("mesure")
+
+    for (i = 0; i < items.length; i++) 
+	scan[i] (items.item(i).firstChild.data);
+}
