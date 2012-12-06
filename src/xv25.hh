@@ -61,6 +61,7 @@ public:
     status_t getPosition(motor_t, int*);
     status_t getPositions(int*, int*);
     status_t getVelocities(int*, int*);
+    status_t getPositionsAndVelocities(int*, int*, int*, int*);
 
     status_t getBatteryLevel(int*);
 

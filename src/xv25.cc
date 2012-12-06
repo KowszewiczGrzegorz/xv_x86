@@ -60,7 +60,7 @@ status_t XV25::send(string cmd)
     uint32_t nbSent = 0;
 
     while (-1 != read(port, &bytes, bufferSize))
-        usleep(10);
+        usleep(100);
     
     if (port > 0) {
         while (nbSent < cmd.size()) {
@@ -139,7 +139,7 @@ status_t XV25::flush()
     if (STATUS_OK == send("\n")) {
         uint8_t bytes[bufferSize];
         int nb; 
-        usleep(500000);
+        usleep(10000);
         do {
             nb = read(port, &bytes, bufferSize);
             usleep(1);
@@ -154,6 +154,9 @@ status_t XV25::flush()
 
 status_t XV25::command(string cmd)
 {
+    //        cerr << "Sending command : \"" << cmd << "\"" << endl;
+
+    flush();
     return send(cmd+"\n");
 }
 
@@ -161,6 +164,7 @@ status_t XV25::commandWithResponse(string cmd, string *response)
 {
     status_t ret = STATUS_OK;
 
+    flush();
     // cerr << "Sending command : \"" << cmd << "\"" << endl;
 
     if (STATUS_OK == send(cmd+"\n"))
@@ -168,7 +172,7 @@ status_t XV25::commandWithResponse(string cmd, string *response)
     else
         ret = STATUS_ERROR;
 
-    // cerr << "  -> \"" << response << "\"" << endl;
+    //   cerr << "  -> \"" << *response << "\"" << endl;
     
     return ret;
 }
@@ -299,6 +303,46 @@ status_t XV25::getVelocities(int* leftVel, int* rightVel)
 
     return ret;
 }
+
+
+status_t XV25::getPositionsAndVelocities(int* leftPos, int* rightPos, int* leftVel, int* rightVel)
+{
+    status_t ret = STATUS_OK;
+    string cmd = "GetMotors";
+    string result;
+
+    if (STATUS_OK == ret)
+        ret = commandWithResponse(cmd, &result);
+
+    if (STATUS_OK == ret) {
+        string tmp = "LeftWheel_PositionInMM,";        
+        size_t pos = result.find(tmp);
+        pos += tmp.size();
+        size_t end = result.substr(pos).find('\n');
+        *leftPos = atoi(result.substr(pos, end).c_str());
+
+        tmp = "RightWheel_PositionInMM,";        
+        pos = result.find(tmp);
+        pos += tmp.size();
+        end = result.substr(pos).find('\n');
+        *rightPos = atoi(result.substr(pos, end).c_str());
+
+        tmp = "LeftWheel_Speed,";
+        pos = result.find(tmp);
+        pos += tmp.size();
+        end = result.substr(pos).find('\n');
+        *leftVel = atoi(result.substr(pos, end).c_str());
+
+        tmp = "RightWheel_Speed,";
+        pos = result.find(tmp);
+        pos += tmp.size();
+        end = result.substr(pos).find('\n');
+        *rightVel = atoi(result.substr(pos, end).c_str());
+    }
+
+    return ret;
+}
+
 
 status_t XV25::getBatteryLevel(int* battery)
 {

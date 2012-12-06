@@ -29,13 +29,19 @@ void Odometry::update(double distLeftWheel, double distRightWheel)
     double diffLeftWheel = distLeftWheel - m_prevDistLeftWheel;
     double diffRightWheel = distRightWheel - m_prevDistRightWheel;
 
-    cerr << "update(" << distLeftWheel << ", " << distRightWheel << ") -> delta = " << diffLeftWheel << ", " << diffRightWheel << endl;
+    // cerr << "update() -> delta=" << diffLeftWheel << ", " << diffRightWheel;
 
     double dTheta = (diffLeftWheel - diffRightWheel) / m_wheelSpacing;
     double dDelta = (diffLeftWheel + diffRightWheel) / 2.0;
 
+    // cerr << ", dTheta=" << dTheta << ", dDelta=" << dDelta << endl;
+    /*
     double dX = dDelta * cos(m_currentPosition.theta + (dTheta/2.0));
     double dY = dDelta * sin(m_currentPosition.theta + (dTheta/2.0));
+    */
+
+    double dX = dDelta * cos(m_currentPosition.theta);
+    double dY = dDelta * sin(m_currentPosition.theta);
 
     m_currentPosition.x += dX;
     m_currentPosition.y += dY;

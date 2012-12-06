@@ -144,41 +144,73 @@ void waitEndOfMovement (XV25* xv25, Odometry* odometry)
 {
     int leftVel, rightVel;
     int leftPos, rightPos;
+    bool movementStarted = false;
 
     do {
-        usleep(100000);
-        
-        // Update odometry
-        xv25->getPositions(&leftPos, &rightPos);
+        xv25->getPositionsAndVelocities(&leftPos, &rightPos, &leftVel, &rightVel);
         odometry->update(leftPos, rightPos);
 
-        usleep(1000);
-        xv25->getVelocities(&leftVel, &rightVel);
-    } while (0 != leftVel || 0 != rightVel);
+        if (0 != leftVel || 0 != rightVel)
+            movementStarted = true;
+
+        if (signalCatched)
+            break;
+
+    } while (!movementStarted || 0 != leftVel || 0 != rightVel);
 }
 
 void testOdometry (XV25* xv25, Odometry* odometry)
 {
     xv25->setTestMode(testModeOn);
     odometry->init();
+    usleep(500000);
 
     odometry->printPosition("[INITIAL] ");
 
     for (uint32_t i = 0; i < 4; i++) {
         // straight line
         xv25->setMotors(500, 500, 100, 100);
+        usleep(10000);
         waitEndOfMovement(xv25, odometry);
         
         odometry->printPosition("[LINE] ");
 
+        if (signalCatched)
+            break;
+
         // quarter turn
         xv25->setMotors(190, -190, 100, 100);
+        usleep(10000);
         waitEndOfMovement(xv25, odometry);
 
         odometry->printPosition("[TURN/4] ");
+
+        if (signalCatched)
+            break;
     }
 
     odometry->printPosition("[END] ");
+
+    xv25->setTestMode(testModeOff);
+}
+
+void testFullTurn (XV25* xv25, Odometry* odometry)
+{
+    xv25->setTestMode(testModeOn);
+    odometry->init();
+    usleep(500000);
+
+    odometry->printPosition("[INITIAL] ");
+
+    xv25->setMotors(764, -764, 100, 100);
+    usleep(10000);
+    waitEndOfMovement(xv25, odometry);
+        
+    odometry->printPosition("[END] ");
+
+    position_t pos = odometry->getCurrentPosition();
+    double dTheta = pos.theta - 2*3.1415926535;
+    cerr << " erreur d'angle = " << dTheta << endl;
 
     xv25->setTestMode(testModeOff);
 }
@@ -270,11 +302,14 @@ int main (void)
     }
     */
 
+    /*
     string version;
     xv25->getVersion(&version);
+    */
 
-    Odometry *odometry = new Odometry(300.0);
+    Odometry *odometry = new Odometry(242.0);
     testOdometry(xv25, odometry);
+    //testFullTurn(xv25, odometry);
 
     xv25->disconnect();
 
