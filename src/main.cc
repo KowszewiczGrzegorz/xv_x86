@@ -210,7 +210,7 @@ void testFullTurn (XV25* xv25, Odometry* odometry)
 
     position_t pos = odometry->getCurrentPosition();
     double dTheta = pos.theta - 2*3.1415926535;
-    cerr << " erreur d'angle = " << dTheta << endl;
+    cerr << " erreur d'angle = " << dTheta << " rad" << endl;
 
     xv25->setTestMode(testModeOff);
 }
@@ -238,18 +238,23 @@ void ropeAlgorithm (XV25 *xv25)
         for (int i = 0; i < 359; i++) {
             if (0 < scan.distInMM[i] && scan.distInMM[i] < 1000.0) {
                 p = pl->p2c(i, scan.distInMM[i]);
-                if (p.y > 0) {
-                    points.push_back(p);
-                    fprintf(fp, "%g\t%g\n", p.x, p.y);
-                }
+                points.push_back(p);
+                fprintf(fp, "%g\t%g\n", p.x, p.y);
             }
         }
         fclose(fp);
     }
 
+    cerr << "Got " << points.size() << " points (!=0)" << endl;
+
     pl->setMaxDistanceRopeAlgorithm(50.0);
 
     vector <vector<point_t> > clusters = pl->scanSegmentation(points, 50.0);
+
+    cerr << "Divide it in " << clusters.size() << " clusters" << endl;
+    for (uint32_t k = 0; k < clusters.size(); k++)
+        cerr << "  (" << k << ") -> " << clusters[k].size() << " points" << endl;
+
     for (uint32_t i = 0; i < clusters.size(); i++) {
         vector<line_t> lines = pl->ropeAlgorithm(clusters[i]);
         cerr << "Cluster " << i << endl;
@@ -274,8 +279,8 @@ void sighandler(int sig)
 }
 
 
-//int main (int argc, char *argv[])
-int main (void)
+int main (int argc, char *argv[])
+// int main (void)
 {
     XV25 *xv25 = new XV25(portName);
 
@@ -293,23 +298,16 @@ int main (void)
 	return -1;
     }
 
-    /*
+    
     if (2 != argc) {
         cerr << "Need 1 argument !" << endl;
         return -1;
     } else {
         webTest(xv25, atoi(argv[1]));
     }
-    */
+    
 
-    /*
-    string version;
-    xv25->getVersion(&version);
-    */
-
-    Odometry *odometry = new Odometry(242.0);
-    testOdometry(xv25, odometry);
-    //testFullTurn(xv25, odometry);
+    //    ropeAlgorithm(xv25) ;
 
     xv25->disconnect();
 
