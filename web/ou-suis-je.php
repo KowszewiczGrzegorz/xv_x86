@@ -2,13 +2,13 @@
 <head>
     <title>Web interface for Neato XV-25 - Où suis-je ?</title>
     <link rel="stylesheet" type="text/css" href="style.css">
-    <script language="javascript" type="text/javascript" src="cookies.js"></script>
-    <script language="javascript" type="text/javascript" src="ou-suis-je.js"></script>
-    <script language="javascript" type="text/javascript" src="demande-scan.js"></script>
+    <script language="javascript" type="text/javascript" src="js/cookies.js"></script>
+    <script language="javascript" type="text/javascript" src="js/ou-suis-je.js"></script>
+    <script language="javascript" type="text/javascript" src="js/demande-scan.js"></script>
     <script language="javascript" type="text/javascript">     
      window.onload = function() {
          xvImage = new Image();
-         xvImage.src = 'xv25-top.png';
+         xvImage.src = 'img/xv25-top.png';
 
          refreshDrawing();
          updateScale();

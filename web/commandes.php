@@ -2,7 +2,7 @@
 <head>
 <title>Web interface for Neato XV-25 - Commandes</title>
     <link rel="stylesheet" type="text/css" href="style.css">
-    <script language="javascript" type="text/javascript" src="cookies.js"></script>
+    <script language="javascript" type="text/javascript" src="js/cookies.js"></script>
     <script language="javascript" type="text/javascript">
          var commands = new Array();
 <?php
@@ -90,7 +90,7 @@ if (isset($_POST['history'])) {
 </ul>
 </div>
 
-<img class="logo" src="xv-25.png" alt="neato XV-25" />
+<img class="logo" src="img/xv-25.png" alt="neato XV-25" />
 
 <?php
     if ($_COOKIE['ipCookie'] == '' || $_COOKIE['portCookie'] == '') {
