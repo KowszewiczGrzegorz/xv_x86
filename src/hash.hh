@@ -18,6 +18,6 @@ using namespace std;
 #define HASH(s)    ((uint32_t)(H256(s,0,0)^(H256(s,0,0)>>16)))
 
 void getFunctionHashes();
-uint32_t hash(const char*);
+uint32_t my_hash(const char*);
 
 #endif /* __HASH_HH__ */ 

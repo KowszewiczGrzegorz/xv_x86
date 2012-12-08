@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-W -Wall -Werror -lm -O3
+CFLAGS=-W -Wall -Werror -lm -O3 -std=c++11
 LDFLAGS=
 EXEC=xv25_test 
 OBJECTS=main xv25 pointsLibrary odometry webApi hash
@@ -25,7 +25,7 @@ $(BINDIR)/$(EXEC): $(OBJS)
 	$(V)printf "$(GREEN)[BIN]$(WHITE) $@ \n"; 
 	$(V)$(CC) -o $@ $^ $(LDFLAGS) 
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cc
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	$(V)test -d $(OBJDIR) || mkdir -p $(OBJDIR)
 	$(V)printf "$(GREEN)[CXX]$(WHITE) $<\n"; 
 	$(V)$(CC) -c $< $(CFLAGS) -o $@

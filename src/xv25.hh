@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <termios.h>
 #include <sys/ioctl.h>
+#include <mutex>
 #include "pointsLibrary.hh"
 
 using namespace std;
@@ -85,6 +86,8 @@ private:
 
     int port;
     string portName;
+
+    mutex connection_mutex;
 };
 
 
