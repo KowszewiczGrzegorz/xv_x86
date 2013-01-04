@@ -1,21 +1,15 @@
 #include <math.h>
-#include <sys/time.h>
 #include <stdint.h>
 #include <signal.h>
 #include <stdlib.h>
-#include "xv25.hh"
-#include "webApi.hh"
-#include "odometry.hh"
-#include "pointsLibrary.hh"
+#include "xv25.h"
+#include "webApi.h"
+#include "odometry.h"
+#include "pointsLibrary.h"
+#include "time.h"
 
 static const string portName = "/dev/ttyACM0";
 
-typedef unsigned long long timestamp_t;
-static timestamp_t get_timestamp () {
-    struct timeval now;
-    gettimeofday (&now, NULL);
-    return  now.tv_usec + (timestamp_t)now.tv_sec * 1000000;
-}
 
 static bool signalCatched = false;
 
@@ -272,6 +266,15 @@ void webTest(XV25* xv25, int portNumber)
 }
 
 
+void testCommSpeed(XV25* xv25)
+{
+    string cmd = "GetVersion";
+    string response;
+
+    xv25->commandWithResponse(cmd, &response);
+}
+
+
 void sighandler(int sig)
 {
     cout << "Signal " << sig << " caught..." << endl;
@@ -298,7 +301,6 @@ int main (int argc, char *argv[])
 	return -1;
     }
 
-    
     if (2 != argc) {
         cerr << "Need 1 argument !" << endl;
         return -1;
@@ -306,6 +308,20 @@ int main (int argc, char *argv[])
         webTest(xv25, atoi(argv[1]));
     }
     
+    /*
+    string response;
+    // for (int i = 0; i < 5; i++) {
+    xv25->getVersion(&response);
+    xv25->setTestMode(testModeOn);
+    xv25->getVersion(&response);
+        //}
+   
+        xv25->getVersion(&response);
+    for (int i = 0; i < 10; i++) {
+        xv25->setTestMode(testModeOn);
+        xv25->setTestMode(testModeOff);
+    }
+    */
 
     //    ropeAlgorithm(xv25) ;
 

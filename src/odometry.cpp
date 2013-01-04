@@ -1,5 +1,5 @@
 #include <math.h>
-#include "odometry.hh"
+#include "odometry.h"
 
 Odometry::Odometry(double wheelSpacing)
 {

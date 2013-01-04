@@ -1,5 +1,5 @@
 
-#include "hash.hh"
+#include "hash.h"
 
 uint32_t my_hash(const char* cmd)
 {

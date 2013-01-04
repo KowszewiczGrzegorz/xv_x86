@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "pointsLibrary.hh"
+#include "pointsLibrary.h"
 
 static const double PI_180 = 3.1415926535/180.0;
 

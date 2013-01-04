@@ -3,9 +3,14 @@
     padding:10px 20px 10px 20px;
     margin:10px;
     background-color:#D3D3D3;
+    width: 600;
     margin-left: auto;
     margin-right: auto;
-    width: 600;
+}
+
+#inMiddle {
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .square {
@@ -103,10 +108,6 @@ div#moreButtonDiv {
 
 #connectionLog {
     display: none;
-    position: relative;
-    margin: 0 auto;
-    margin-left:auto;
-    margin-right:auto;
 }
 
 p.ok {
@@ -208,3 +209,5 @@ div#topnav ul li a:hover{
 .gray {
     color:#505050;
 }
+
+
