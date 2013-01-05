@@ -62,36 +62,28 @@ if (isset($_POST['history'])) {
            cmd_input.select();
        }
 
-<?php
-if (isset($_POST['cmd'])) {
-    echo "function sendCommand() {\n";
-    echo "var xmlhttp;\n";
-    echo "if (window.XMLHttpRequest) {\n";
-    echo "xmlhttp = new XMLHttpRequest();\n";
-    echo "} else {\n";
-    echo "xmlhttp = new ActiveXObject(\"Microsoft.XMLHTTP\");\n";
-    echo "}\n";
-    echo "xmlhttp.onreadystatechange = function() {\n";
-    echo "  if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {\n";
-    //    echo "    jQuery(\"#response\").slideToggle(\"slow\");\n";
-    echo "    document.getElementById(\"response\").innerHTML = xmlhttp.responseText;\n";
-    // echo "    jQuery(\"#response\").slideToggle(\"slow\");\n";
-    echo "  }\n";
-    echo "}\n";
-    echo "xmlhttp.open(\"POST\", \"commandes_exec.php\", true);\n";
-    echo "xmlhttp.setRequestHeader('Content-Type','application/x-www-form-urlencoded');\n";
-    echo "xmlhttp.send(\"cmd=" . htmlspecialchars($_POST['cmd']) . "\");\n";
-    echo "}";
-}
-?>
+       function sendCommand() {
+           var cmd = document.getElementById('cmd').value;
+           var xmlhttp;
+           if (window.XMLHttpRequest) {
+               xmlhttp = new XMLHttpRequest();
+           } else {
+               xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+           }
+           xmlhttp.onreadystatechange = function() {
+               if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                   document.getElementById("response").innerHTML = xmlhttp.responseText;
+                   $("#response").slideToggle("slow");
+               }
+           }
+           xmlhttp.open("POST", "commandes_exec.php", true);
+           xmlhttp.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+           xmlhttp.send("cmd="+cmd);
+       }
 
        window.onload = function() {
            setCursor();
            getCookie();
-           <?php
-           if (isset($_POST['cmd']))
-               echo "sendCommand();\n";
-           ?>
        }
     </script>
 </head>
@@ -118,69 +110,44 @@ if (isset($_POST['cmd'])) {
 ?>
 
 <div id="inMiddle">
-    <div class="form">
-        <h2>Commande</h2>
-        <form id="form_id" action="commandes.php" method="post">
-            <input type="hidden" id="ip" name="ip" maxlength="10" size="10" value="" />
-            <input type="hidden" id="port" name="port" maxlength="4" size="4" value="" />
-            <input type="text" id="cmd" name="cmd" maxlength="30" size="30" /> 
-            <input type="submit" class="moreButton historyButtons" id="connectionLogButton" value="OK">
-<?php
-    $history = "";
-if (isset($_POST['history'])) {
-    $history = htmlspecialchars($_POST['history']);
-}
-if (isset($_POST['cmd']))
-    $history = htmlspecialchars($_POST['cmd']) . "," . $history;
-echo "            <input type=\"hidden\" id=\"history\" name=\"history\" value=\"" . $history . "\" />\n";
-?>
-    </form>
+<div class="form">
+    <h2>Commande</h2>
+    <input id="cmd" type="text" maxlength="30" size="30" />
+    <button id="connectionLogButton" value="OK" onclick="sendCommand()" />
+<!--
+    <button class="moreButton historyButtons" id="connectionLogButton" value="OK" onclick="sendCommand()" />
+-->
 </div>
 
-<?php
-error_reporting(E_ALL);
+<div id="response">
+    <div class="form centered">Executing command ...</div>
+    <div id="connectionLog"></div>
+</div>
 
-if (isset($_POST['cmd'])) {
-    echo "    <div id=\"response\">\n";
-    echo "        <div class=\"form centered\">Executing command ...</div>\n";
-    echo "        <div id=\"connectionLog\"></div>\n";
-    echo "    </div>\n";
+<script>
+    $("#response").click(function () {
+        $("#connectionLog").slideToggle("slow");
+    });
+</script>
 
-    echo "    <script>\n";
-    echo "       $(\"#response\").click(function () {\n";
-    echo "           $(\"#connectionLog\").slideToggle(\"slow\");\n";
-    echo "       });\n";
-    echo "    </script>\n";
-}
-?>
-
-<?php
-if (isset($_POST['cmd']) || isset($_POST['history'])) {
-    echo "    <div class=\"form\" id=\"fullHistory\">\n";
-    echo "        <h2>Historique</h2>\n";
-    echo "        <div id=\"historyList\">\n";
-    echo "            <p class=\"square\" id=\"historyLine\">\n";
-    echo "                <a href=\"#\" onclick=\"document.getElementById('cmd').value='" . htmlspecialchars($_POST['cmd']) . "';return false;\">" . htmlspecialchars($_POST['cmd']) . "</a>\n";
-    echo "            </p>\n";
-    if ($nbHistory > 1) {
-        echo "            <p class=\"square\" id=\"historyLine\">\n";
-        echo "                <a href=\"#\" onclick=\"document.getElementById('cmd').value='" . $historyList[0] . "';return false;\">" . $historyList[0] . "</a>\n";
-        echo "            </p>\n";
-    }
-    echo "        </div>\n";
-    echo "        <div id=\"moreButtonDiv\">\n";
-    if ($nbHistory > 2) {
-        echo "            <div class=\"moreButton historyButtons\">\n";
-        echo "                <a href=\"javascript:showMoreHistory(2)\"/><< (". ($nbHistory-2) .") more >></a>\n";
-        echo "            </div>\n";
-    }
-    echo "        </div>\n";
-    echo "        <div class=\"moreButton historyButtons\">\n";
-    echo "            <a href=\"javascript:clearHistory()\"/><< clear >></a>\n";
-    echo "        </div>\n";
-    echo "    </div>\n";
-}
-?>
+<div class="form" id="fullHistory">
+    <h2>Historique</h2>
+    <div id="historyList">
+<!--
+       <p class="square" id="historyLine">
+           <a href="#" onclick="document.getElementById('cmd').value='" . $historyList[0] . "';return false;\">" . $historyList[0] . "</a>"
+       </p>
+-->
+    </div>
+    <div id="moreButtonDiv">
+        <div class="moreButton historyButtons">
+            <a href="javascript:showMoreHistory(2)"><< more >></a>
+        </div>
+        <div class="moreButton historyButtons">
+            <a href="javascript:clearHistory()"/><< clear >></a>
+        </div>
+    </div>
+</div>
 </div>
 </body>
 </html>
