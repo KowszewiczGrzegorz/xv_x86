@@ -1,7 +1,9 @@
+<?php include 'menu.php'; ?>
 <html>
 <head>
 <title>Web interface for Neato XV-25 - Configuration</title>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
     <script language="javascript" type="text/javascript" src="js/cookies.js"></script>
     <script language="javascript" type="text/javascript">
      function setCursor() {
@@ -33,26 +35,22 @@
 <body>
 <h1>Web interface for Neato XV-25</h1>
 
-<div id="topnav">
-<ul>
-    <li><a href="commandes.php">Commandes</a></li>
-    <li><a href="ou-suis-je.php">Où suis-je ?</a></li>
-    <li><a href="configuration.php">Configuration</a></li>
-</ul>
-</div>
+<?php showMenu(); ?>
 
 <img class="logo" src="img/xv-25.png" alt="neato XV-25" />
 
 
-<div class="form">
-    <h2>Configuration de la connection</h2>
-    <form id="form_id" action="configuration.php" method="post">
+<div id="inMiddle">
+    <div class="form">
+        <h2>Configuration de la connection</h2>
+        <form id="form_id" action="configuration.php" method="post">
 <?php
-    echo "        IP <input type=\"text\" id=\"ip\" name=\"ip\" maxlength=\"10\" size=\"10\" value=\"" . $ip . "\" /><br/>\n";
-    echo "        port <input type=\"text\" id=\"port\" name=\"port\" maxlength=\"4\" size=\"4\" value=\"" . $port . "\" /><br/>\n";
+    echo "            IP <input type=\"text\" id=\"ip\" name=\"ip\" maxlength=\"10\" size=\"10\" value=\"" . $ip . "\" /><br/>\n";
+    echo "            port <input type=\"text\" id=\"port\" name=\"port\" maxlength=\"4\" size=\"4\" value=\"" . $port . "\" /><br/>\n";
 ?>
-        <input type="submit" class="moreButton historyButtons" id="connectionLogButton" value="OK">
-    </form>
+            <input type="submit" class="moreButton historyButtons" id="connectionLogButton" value="OK">
+        </form>
+    </div>
 </div>
 </body>
 </html>
