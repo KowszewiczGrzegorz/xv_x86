@@ -37,8 +37,11 @@
     </div>
     
     <div class="form">
+        <b>Position click</b>
+        <div id="posClick"></div>
         <b>Commande</b>
         <div id="velocities"></div>
+        <div id="realVelocities"></div>
     </div>
 </div>
 
