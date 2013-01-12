@@ -9,6 +9,19 @@
     <title>Web interface for Neato XV-25 - Webcam</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <script language="javascript" type="text/javascript">
+        window.onunload = function() {
+            var xmlhttp;
+            if (window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.open("POST", "killWebcam.php", true);
+            xmlhttp.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+            xmlhttp.send();
+        };
+    </script>
 </head>
 <body>
 <h1>Web interface for Neato XV-25</h1>
