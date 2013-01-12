@@ -121,7 +121,7 @@ function mouseMove(event) {
         leftVel = leftVel * (rau / 50.0);
         rightVel = rightVel * (rau / 50.0);
 
-        document.getElementById('velocities').innerHTML = "joystick leftVel = " + leftVel + ", rightVel = " + rightVel + "<br/>rau = " + rau + ", theta = " + theta;
+        document.getElementById('velocities').innerHTML = "joystick leftVel = " + leftVel + ", rightVel = " + rightVel + "rau = " + rau + ", theta = " + theta;
     }
 }
 
