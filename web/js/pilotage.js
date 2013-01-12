@@ -87,8 +87,8 @@ function mouseMove(event) {
             rau = 50;
 
         // x² law for speed
-        rau = rau / 50.0;
-        rau = 50 * rau * rau:
+        rau = rau / 50;
+        rau = 50 * rau * rau;
 
         X = rau * Math.cos(theta);
         Y = rau * Math.sin(theta);
@@ -121,7 +121,7 @@ function mouseMove(event) {
         leftVel = leftVel * (rau / 50.0);
         rightVel = rightVel * (rau / 50.0);
 
-        document.getElementById('velocities').innerHTML = "joystick leftVel = " + leftVel + ", rightVel = " + rightVel + "rau = " + rau + ", theta = " + theta;
+        document.getElementById('velocities').innerHTML = "joystick leftVel = " + leftVel + ", rightVel = " + rightVel + "<br/>rau = " + rau + ", theta = " + theta;
     }
 }
 
