@@ -172,6 +172,8 @@ div#topnav ul li a:hover{
     margin-right: auto;
     width: 600;
     color: #505050;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
 }
 
 .warning a {

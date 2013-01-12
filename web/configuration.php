@@ -1,3 +1,5 @@
+<?php require('login_xv.php'); ?>
+
 <?php include 'menu.php'; ?>
 <html>
 <head>
