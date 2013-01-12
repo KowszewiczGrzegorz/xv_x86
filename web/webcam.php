@@ -1,5 +1,4 @@
 <?php require('login_xv.php'); ?>
-
 <?php include 'menu.php'; ?>
 <html>
 <head>
@@ -15,7 +14,7 @@
 <div id="inMiddle">
     <div class="form" id="webcam">
 	<h2>Webcam </h2>
-        <img src="http://81.56.150.108:11042/webcam.mjpeg" alt="webcam"></img>
+        <img src="http://81.56.150.108:11042/webcam.mjpeg" alt="webcam"/>
     </div>
 </div>
 
