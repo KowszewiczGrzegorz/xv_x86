@@ -86,6 +86,10 @@ function mouseMove(event) {
         if (rau > 50)
             rau = 50;
 
+        // x² law for speed
+        rau = rau / 50.0;
+        rau = 50 * rau * rau:
+
         X = rau * Math.cos(theta);
         Y = rau * Math.sin(theta);
         drawJoystick(X, Y);
@@ -93,6 +97,9 @@ function mouseMove(event) {
         theta = -(Math.PI/2) - theta;
         if (theta < -Math.PI)
             theta = (2*Math.PI) + theta;
+
+        // theta distortion for usability
+        
 
         if (theta > 0) {
             if (theta < (Math.PI/2)) {
@@ -114,7 +121,7 @@ function mouseMove(event) {
         leftVel = leftVel * (rau / 50.0);
         rightVel = rightVel * (rau / 50.0);
 
-        document.getElementById('velocities').innerHTML = "joystick leftVel = " + leftVel + ", rightVel = " + rightVel;
+        document.getElementById('velocities').innerHTML = "joystick leftVel = " + leftVel + ", rightVel = " + rightVel + "<br/>rau = " + rau + ", theta = " + theta;
     }
 }
 
