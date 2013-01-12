@@ -15,7 +15,7 @@
 <div id="inMiddle">
     <div class="form">
 	<h2>Webcam </h2>
-        <img src="http://81.56.150.108:10042/webcam.mjpg" alt="webcam"/>
+        <img src="http://81.56.150.108:11042/webcam.mjpg" alt="webcam"/>
     </div>
 </div>
 
