@@ -1,5 +1,9 @@
 <?php require('login_xv.php'); ?>
 <?php include 'menu.php'; ?>
+<?php 
+    exec("sudo webcam.sh > /dev/null 2>&1 &");
+?>
+
 <html>
 <head>
     <title>Web interface for Neato XV-25 - Webcam</title>
@@ -14,7 +18,8 @@
 <div id="inMiddle">
     <div class="form" id="webcam">
 	<h2>Webcam </h2>
-        <img src="http://81.56.150.108:11042/webcam.mjpeg" alt="webcam"/>
+        <!-- <img src="http://81.56.150.108:11042/webcam.mjpeg" alt="webcam"/> -->
+	<embed type="application/x-vlc-plugin" name="player" autoplay="yes" loop="no" width="640" height="480" target="http://81.56.150.108:11042/webcam.mjpeg" />
     </div>
 </div>
 
