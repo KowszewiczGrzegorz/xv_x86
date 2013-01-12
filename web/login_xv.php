@@ -21,6 +21,13 @@ if (!$_SESSION['loggedIn']): ?>
     <link rel="stylesheet" type="text/css" href="style.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon" />
     <title>Web interface for Neato XV-25 - login</title>
+    <script language="javascript" type="text/javascript">
+     window.onload = function() {
+            var pwd = document.getElementById('password');
+            pwd.focus();
+            pwd.select();
+     }
+    </script>
 </head>
 <body>
 
@@ -32,7 +39,7 @@ if (!$_SESSION['loggedIn']): ?>
         <div class="form">
             <h2>You need to login !</h2>
             <form method="post">
-                <input type="password" name="password">
+                <input id="password" type="password" name="password">
                 <input class="moreButton historyButtons" type="submit" name="submit" value="Login">
              </form>
         </div>
