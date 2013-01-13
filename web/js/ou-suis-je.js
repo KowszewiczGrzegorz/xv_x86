@@ -126,7 +126,7 @@ function refreshDrawing() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     drawSquares(context);
     drawXV(context);
-//    drawScan(context);
+    drawScan(context);
 
     canvas = document.getElementById("xv-scale");
     context = canvas.getContext("2d");
