@@ -86,13 +86,13 @@ function mouseMove(event) {
         if (rau > 50)
             rau = 50;
 
-        // x² law for speed
-        rau = rau / 50;
-        rau = 50 * rau * rau;
-
         X = rau * Math.cos(theta);
         Y = rau * Math.sin(theta);
         drawJoystick(X, Y);
+
+        // x² law for speed
+        rau = rau / 50;
+        rau = 50 * rau * rau * rau;
 
         theta = -(Math.PI/2) - theta;
         if (theta < -Math.PI)
