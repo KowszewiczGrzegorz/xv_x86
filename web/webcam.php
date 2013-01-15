@@ -1,7 +1,7 @@
 <?php require('login_xv.php'); ?>
 <?php include 'menu.php'; ?>
 <?php 
-    exec("sudo webcam.sh > /dev/null 2>&1 &");
+    // exec("sudo webcam.sh > /dev/null 2>&1 &");
 ?>
 
 <html>
@@ -18,8 +18,8 @@
 <div id="inMiddle">
     <div class="form" id="webcam">
 	<h2>Webcam </h2>
-        <!-- <img src="http://81.56.150.108/webcam.mjpeg" alt="webcam"/> -->
-	<embed type="application/x-vlc-plugin" name="player" autoplay="yes" loop="no" width="640" height="480" target="http://81.56.150.108/webcam.mjpeg" />
+        <img src="http://81.56.150.108:8080/?action=stream" width="640" height="480" alt="webcam"/>
+	<!--  <embed type="application/x-vlc-plugin" name="player" autoplay="yes" loop="no" width="640" height="480" target="http://81.56.150.108:8080/webcam.mjpeg" />  -->
     </div>
 </div>
 
