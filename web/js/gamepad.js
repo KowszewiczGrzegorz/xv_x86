@@ -1,20 +1,22 @@
-var gamepadActive = false;
+function updateStatus()
+{
+    window.webkitRequestAnimationFrame(updateStatus);
  
-function gamepadConnected (evt) {
+    var gamepads = navigator.webkitGamepads;
+ 
+    var data = '';
+    for (var padindex = 0; padindex < gamepads.length; ++padindex)
+    {
+        var pad = gamepads[padindex];
+        var i;
+        if (!pad) continue;
+        data += '<pre>' + pad.index + ": " + pad.id + "<br/>";
+        for (i = 0; i < pad.buttons.length; ++i)
+            data += "button" + i + ": " + pad.buttons[i] + "<br/>";
+        for (i = 0; i < pad.axes.length; ++i)
+            data += "axis" + i + ": " + pad.axes[i] + "<br/>";
+    }
     document.getElementById('gamepadInfo').innerHTML = "Gamepad connected";
-    gamepadActive = true;
-}
-
-function gamepadDisconnected (evt) {
-    document.getElementById('gamepadInfo').innerHTML = "Gamepad disconnected";
-    gamepadActive = false;
 }
  
-function buttonPressed (evt, pressed) {
-    document.getElementById('gamepadInfo').innerHTML = "Button " + evt + " was " + (pressed ? "pressed" : "released");
-}
-
-window.addEventListener('MozGamepadConnected', gamepadConnected);
-window.addEventListener('MozGamepadDisconnected', gamepadDisconnected);
-window.addEventListener("MozGamepadButtonDown", function(evt) { buttonPressed(evt, true); } );
-window.addEventListener("MozGamepadButtonUp", function(evt) { buttonPressed(evt, false); } );
+window.webkitRequestAnimationFrame(updateStatus);
