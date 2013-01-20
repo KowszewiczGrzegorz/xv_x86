@@ -14,7 +14,7 @@
 <div id="inMiddle">
     <div class="form" id="gamepad">
 	<h2>Gamepad</h2>
-        <div id="gamepadInfo"></div>
+        <div id="gamepadInfo">... Gamepad ...</div>
     </div>
     <script language="javascript" type="text/javascript" src="js/gamepad.js"></script>
 </div>

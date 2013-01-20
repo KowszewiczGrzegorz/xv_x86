@@ -16,7 +16,7 @@ function updateStatus()
         for (i = 0; i < pad.axes.length; ++i)
             data += "axis" + i + ": " + pad.axes[i] + "<br/>";
     }
-    document.getElementById('gamepadInfo').innerHTML = "Gamepad connected";
+    document.getElementById('gamepadInfo').innerHTML = data;
 }
  
 window.webkitRequestAnimationFrame(updateStatus);
