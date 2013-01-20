@@ -7,7 +7,6 @@ function showMenu() {
     echo "    <li><a href=\"ou-suis-je.php\">Où suis-je ?</a></li>\n";
     echo "    <li><a href=\"configuration.php\">Configuration</a></li>\n";
     echo "    <li><a href=\"webcam.php\">Webcam</a></li>\n";
-    echo "    <li><a href=\"gamepad.php\">Gamepad</a></li>\n";
     echo "</ul>\n";
     echo "</div>\n";
 }
