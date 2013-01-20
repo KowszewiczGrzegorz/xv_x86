@@ -1,9 +1,5 @@
 <?php require('login_xv.php'); ?>
 <?php include 'menu.php'; ?>
-<?php 
-    // exec("sudo webcam.sh > /dev/null 2>&1 &");
-?>
-
 <html>
 <head>
     <title>Web interface for Neato XV-25 - Webcam</title>
