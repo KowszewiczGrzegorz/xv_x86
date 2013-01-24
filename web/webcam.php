@@ -15,6 +15,7 @@
     <div class="form" id="webcam">
 	<h2>Webcam </h2>
         <img src="http://81.56.150.108:443/?action=stream" width="640" height="480" alt="webcam"/>
+        <br/><br/>
     </div>
 </div>
 
