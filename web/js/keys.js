@@ -1,10 +1,12 @@
 var keys = new Array();
 
 function doKeyDown(evt){
+    alert("key down");
     keys[evt.keyCode] = true;
 }
 
 function doKeyUp(evt){
+    alert("key up");
     keys[evt.keyCode] = false;
 }
 
