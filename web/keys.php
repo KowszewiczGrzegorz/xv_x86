@@ -5,7 +5,7 @@
     <title>Web interface for Neato XV-25 - Keys</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon" />
-    <script language="javascript" type="text/javascript" src="js/commandes.js"></script>
+    <script language="javascript" type="text/javascript" src="js/keys.js"></script>
 </head>
 <body>
 <h1>Web interface for Neato XV-25</h1>
@@ -15,10 +15,7 @@
 <div id="inMiddle">
     <div class="form">
 	<h2>Keys</h2>
-        <canvas id="keys" width="300" height="200">
-            This text is displayed if your browser does not support HTML5 Canvas.
-        </canvas>
-        <div id="keyEvent"></div>
+        <div id="keyEvent" style:"padding: 20px;"></div>
     </div>
 </div>
 

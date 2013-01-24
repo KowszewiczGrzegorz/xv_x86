@@ -1,36 +1,60 @@
 var keys = new Array();
 
 function doKeyDown(evt){
-    alert("key down");
     keys[evt.keyCode] = true;
+    move();
 }
 
 function doKeyUp(evt){
-    alert("key up");
     keys[evt.keyCode] = false;
+    move();
 }
 
-function move() {   
+function move() {
+    var i = 0; 
     if (38 in keys && keys[38]){ //up
-        document.getElementById('keyEvent').innerHTML = "Up was pushed";
+	i = i + 1;
     }
     if (40 in keys && keys[40]){ //down
-        document.getElementById('keyEvent').innerHTML = "Down was pushed";        
+        i = i + 2;        
     }
     if (37 in keys && keys[37]){ //left
-        document.getElementById('keyEvent').innerHTML = "Left was pushed";        
+	i = i + 4;    
     }
     if (39 in keys && keys[39]){ //right
-        document.getElementById('keyEvent').innerHTML = "Right was pushed";        
+	i = i + 8;
     }
+
+    var text;
+    switch(i) {
+    case 0: text = "no move"; break;
+    case 1: text = "straight line"; break;
+    case 2: text = "backwards"; break;
+    case 3: text = "??? front and back ???"; break;
+    case 4: text = "left a lot forward"; break;
+    case 5: text = "left a bit forward"; break;
+    case 6: text = "turn on place left"; break;
+    case 7: text = "??? front and back ???"; break;
+    case 8: text = "right a lot forward"; break;
+    case 9: text = "right a bit forward"; break;
+    case 10: text = "turn on place right"; break;
+    case 11: text = "??? front and back ???"; break;
+    case 12: text = "??? left & right ???"; break;
+    case 13: text = "??? left & right ???"; break;
+    case 14: text = "??? left & right ???"; break;
+    case 15: text = "??? left & right ???"; break;
+    case 16: text = "??? left & right ???"; break;
+    default: text = "wtf ???"; break;
+    }
+
+    document.getElementById('keyEvent').innerHTML = text;
 }
 
 function init() {
-    canvas = document.getElementById("keys");
-    ctx = canvas.getContext("2d");
-    return setInterval(move, 500);
+    setInterval(move, 500);
 }
 
-init();
 window.addEventListener('keyup',doKeyUp,true);
 window.addEventListener('keydown',doKeyDown,true);
+init();
+
