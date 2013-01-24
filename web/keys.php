@@ -15,7 +15,10 @@
 <div id="inMiddle">
     <div class="form">
 	<h2>Keys</h2>
-        <div id="keyEvent" style:"padding: 20px;"></div>
+        <b>Movement</b>
+	<div id="keyEvent"></div><br/>
+	<b>Tilt</b>
+	<div id="tiltEvent"</div><br/>
     </div>
 </div>
 

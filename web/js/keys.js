@@ -48,6 +48,22 @@ function move() {
     }
 
     document.getElementById('keyEvent').innerHTML = text;
+
+    var tilt = 0;
+    if (90 in keys && keys[90]) // z
+        tilt = tilt + 1;
+    if (83 in keys && keys[83]) // s
+        tilt = tilt + 2;
+    
+    switch(tilt) {
+    case 0: text = "neutral"; break;
+    case 1: text = "up"; break;
+    case 2: text = "down"; break;
+    case 3: text = "up & down ???"; break;
+    default: text = "wtf ???"; break;
+    }
+
+    document.getElementById('tiltEvent').innerHTML = text;
 }
 
 function init() {
