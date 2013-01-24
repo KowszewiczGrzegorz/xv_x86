@@ -18,6 +18,7 @@
         <canvas id="keys" width="300" height="200">
             This text is displayed if your browser does not support HTML5 Canvas.
         </canvas>
+        <div id="keyEvent"></div>
     </div>
 </div>
 

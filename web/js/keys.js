@@ -10,16 +10,16 @@ function doKeyUp(evt){
 
 function move() {   
     if (38 in keys && keys[38]){ //up
-        
+        document.getElementById('keyEvent').innerHTML = "Up was pushed";
     }
     if (40 in keys && keys[40]){ //down
-        
+        document.getElementById('keyEvent').innerHTML = "Down was pushed";        
     }
     if (37 in keys && keys[37]){ //left
-        
+        document.getElementById('keyEvent').innerHTML = "Left was pushed";        
     }
     if (39 in keys && keys[39]){ //right
-        
+        document.getElementById('keyEvent').innerHTML = "Right was pushed";        
     }
 }
 
