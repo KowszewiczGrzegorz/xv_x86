@@ -4,7 +4,7 @@ error_reporting(E_ALL);
 
 if (isset($_POST['cmd'])) {
 
-    echo "<div class=\"form\" id=\"connectionLog\" style=\"cursor: pointer;\">\n";
+    echo "<div class=\"form\" id=\"connectionLog\" style=\"cursor: pointer;\" onClick=\"hideConnectionLog();\">\n";
     echo "    <h2>Connection Log</h2>\n";
     echo "    <div class=\"square\">\n";
 
@@ -93,8 +93,8 @@ if (isset($_POST['cmd'])) {
         echo "        <b>Check the <a href=\"#\" onclick=\"toggleConnectionLog()\">connection logs</a></b>\n";
     }
     echo "    </div>\n";
-    
-    echo "        <div class=\"moreButton historyButtons\" id=\"connectionLogButton\"><< connection log >></div>\n";
+
+    echo "        <div class=\"moreButton historyButtons\" id=\"connectionLogButton\" onClick=\"showConnectionLog();\"><< connection log >></div>\n";
 
     echo "</div>\n";
 }

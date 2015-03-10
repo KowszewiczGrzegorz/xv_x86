@@ -32,13 +32,24 @@
     }
 ?>
 
+<div class="fonctions">
+    <h2>Fonctions</h2>
+    <?php
+    $functions = file('/var/www/functions.txt'); 
+    foreach ($functions as $functionNum => $function) {
+        $functionExplode = explode(" - ", $function);
+        echo "<span onClick=\"document.getElementById('cmd').value='" . htmlspecialchars($functionExplode[0]) . "'; setCursor();\"><b>" . htmlspecialchars($functionExplode[0]) . "</b></span><br/>\n";
+    }
+    ?> 
+</div>
+
 <div id="inMiddle">
 
 <img src="img/loading.gif" alt="loading" id="loading_img" /><br/><br/>
 
 <div class="form">
     <h2>Commande</h2>
-    <input id="cmd" type="text" maxlength="30" size="30" onchange="sendCommand()" />
+    <input id="cmd" type="text" maxlength="100" size="45" onKeyPress="return submitEnter(this,event);" />
     <button class="moreButton historyButtons" id="connectionLogButton" onclick="sendCommand()">OK</button>
 </div>
 
@@ -49,18 +60,15 @@
 <div class="form" id="fullHistory">
     <h2>Historique</h2>
     <div id="historyList">
-<!--
-       <p class="square" id="historyLine">
-           <a href="#" onclick="document.getElementById('cmd').value='" . $historyList[0] . "';return false;\">" . $historyList[0] . "</a>"
-       </p>
--->
     </div>
     <div id="moreButtonDiv">
+        <!--
         <div class="moreButton historyButtons">
             <a href="javascript:showMoreHistory(2)"><< more >></a>
         </div>
+        -->
         <div class="moreButton historyButtons">
-            <a href="javascript:clearHistory()"/><< clear >></a>
+            <a href="javascript:clearHistory()"><< clear >></a>
         </div>
     </div>
 </div>

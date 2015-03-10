@@ -6,13 +6,14 @@ else
 endif
 
 CFLAGS=-W -Wall -Werror -lm -O3 -std=c++11
+# CFLAGS=-W -Wall -Werror -lm -O3 -std=c++0x
 LDFLAGS=
 EXEC=xv25_test 
 OBJECTS=main xv25 pointsLibrary odometry webApi hash
 
 OBJS = $(OBJECTS:%=$(OBJDIR)/%.o)
 
-ARCH=x86
+ARCH=arm
 TOPDIR=..
 SRCDIR = $(TOPDIR)/src
 OBJDIR = $(TOPDIR)/obj/$(ARCH)

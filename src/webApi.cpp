@@ -16,8 +16,10 @@ WebApi::WebApi(XV25* xv25, int portNumber) {
     m_serv_addr.sin_family = AF_INET;
     m_serv_addr.sin_addr.s_addr = INADDR_ANY;
     m_serv_addr.sin_port = htons(portNumber);
-    if (bind(m_sockfd, (struct sockaddr *) &m_serv_addr, sizeof(m_serv_addr)) < 0) {
-        cerr << "ERROR on binding" << endl;
+    int res = bind(m_sockfd, (struct sockaddr *) &m_serv_addr, sizeof(m_serv_addr));
+    if (res < 0) {
+        cerr << "ERROR on binding (" << res << ")" << endl;
+        perror ("The following error occurred");
         m_status = STATUS_ERROR;
         return;
     }

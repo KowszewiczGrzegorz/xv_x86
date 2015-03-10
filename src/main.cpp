@@ -8,8 +8,7 @@
 #include "pointsLibrary.h"
 #include "time.h"
 
-static const string portName = "/dev/ttyACM0";
-
+static const string portName = "/dev/ttyACM";
 
 static bool signalCatched = false;
 
@@ -69,8 +68,7 @@ void wallFollower(XV25 *xv25)
         t1 = get_timestamp();
 
         cerr << "dist = " << dist << " => cmd motor = [" << lSpeed << ", ";
-        cerr << rSpeed << "] in " << ((t1-t0)/1000.0L) << "ms" << endl;
-        
+        cerr << rSpeed << "] in " << ((t1-t0)/1000.0L) << "ms" << endl;        
         while ((get_timestamp()-t0) < 500000.0L)
             usleep(100);
     }
@@ -301,18 +299,21 @@ int main (int argc, char *argv[])
 	return -1;
     }
 
+
     if (2 != argc) {
         cerr << "Need 1 argument !" << endl;
         return -1;
     } else {
         webTest(xv25, atoi(argv[1]));
     }
-    
-    /*
+   
+/* 
     string response;
-    // for (int i = 0; i < 5; i++) {
     xv25->getVersion(&response);
-    xv25->setTestMode(testModeOn);
+    cerr << "Version : \"" << response << "\"" << endl;  
+ */
+/*
+xv25->setTestMode(testModeOn);
     xv25->getVersion(&response);
         //}
    
@@ -321,9 +322,7 @@ int main (int argc, char *argv[])
         xv25->setTestMode(testModeOn);
         xv25->setTestMode(testModeOff);
     }
-    */
-
-    //    ropeAlgorithm(xv25) ;
+  */  
 
     xv25->disconnect();
 

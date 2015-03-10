@@ -12,6 +12,27 @@ html {
     border-radius: 15px;
 }
 
+.fonctions {
+    border:1px solid #A9A9A9;
+    padding:10px 20px 10px 20px;
+    margin:48px 10px 10px 10px;
+    background-color:#D3D3D3;
+    width: 200;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+    position:absolute;
+    float:left;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 11px;
+    color:#505050;
+}
+
+@media screen and (max-width: 1130px) {
+    .fonctions {
+        display: none;
+    }
+}
+
 #inMiddle {
     width: 600;
     margin-left: auto;
@@ -221,7 +242,7 @@ div#topnav ul li a:hover{
 
 
 #fullHistory {
-    display: none;
+    display: none; 
 }
 
 #response {

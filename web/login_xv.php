@@ -1,5 +1,5 @@
 <?php
-$password = '13b0600885dbce6125700fd0bd0121ed28ce3e17';
+$password = '813862ac0d98bf89b79376dd314c71932af539c2';
 
 session_start();
 if (!isset($_SESSION['loggedIn'])) {

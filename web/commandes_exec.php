@@ -4,7 +4,7 @@ error_reporting(E_ALL);
 
 if (isset($_POST['cmd'])) {
 
-    echo "<div class=\"form\" id=\"connectionLog\" style=\"cursor: pointer;\">\n";
+    echo "<div class=\"form\" id=\"connectionLog\" style=\"cursor: pointer;\" onClick=\"hideConnectionLog();\">\n";
     echo "    <h2>Connection Log</h2>\n";
     echo "    <div class=\"square\">\n";
 
@@ -82,19 +82,23 @@ if (isset($_POST['cmd'])) {
     echo "    </div>\n";
     echo "</div>\n\n";
 
-    echo "<div class=\"form\">\n";
+    echo "<div id=\"responseText\" class=\"form\">\n";
     echo "    <h2>" . htmlspecialchars($_POST['cmd']) . "</h2>  \n";
-    echo "    <div class=\"square\">\n";
 
-    if (0 == $error) {
-        echo $response;
-    } else {
-        echo "        Some error occured in the dialogue with the XV-25 ! <br/>\n";
-        echo "        <b>Check the <a href=\"#\" onclick=\"toggleConnectionLog()\">connection logs</a></b>\n";
+    if (strlen($response) > 6 || 0 != $error) 
+    { 
+        echo "    <div class=\"square\">\n";
+
+        if (0 == $error) {
+            echo $response;
+        } else {
+            echo "        Some error occured in the dialogue with the XV-25 ! <br/>\n";
+            echo "        <b>Check the <a href=\"#\" onclick=\"toggleConnectionLog()\">connection logs</a></b>\n";
+        }
+        echo "</div>\n";
     }
-    echo "    </div>\n";
-    
-    echo "        <div class=\"moreButton historyButtons\" id=\"connectionLogButton\"><< connection log >></div>\n";
+
+    echo "        <div class=\"moreButton historyButtons\" id=\"connectionLogButton\" onClick=\"showConnectionLog();\"><< connection log >></div>\n";
 
     echo "</div>\n";
 }

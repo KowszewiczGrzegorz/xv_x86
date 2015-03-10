@@ -5,17 +5,19 @@
 #include <stdint.h>
 #include "hash.h"
 #include "xv25.h"
-#include "time.h"
+// #include "time.h"
 
 static const uint32_t bufferSize = 1024;
 
 // Colors
+
 static const char* WHITE = "\033[0m";
 static const char* RED = "\033[1;31m";
-static const char* GREEN = "\033[1;32m";
+//static const char* GREEN = "\033[1;32m";
 static const char* YELLOW = "\033[1;33m";
-static const char* BLUE = "\033[1;34m";
+//static const char* BLUE = "\033[1;34m";
 static const char* PURPLE = "\033[1;35m";
+
 // static const char* WHITE_BOLD = "\033[1;37m";
 
 
@@ -40,19 +42,26 @@ status_t XV25::connect()
     tio.c_cc[VMIN] = 1;
     tio.c_cc[VTIME] = 5;
 
-    port = open(portName.c_str(), O_RDWR | O_NONBLOCK);
+    bool connected = false;
+    int i = 0;
+    while (!connected && i < 10) {
+        string portNamei = portName + (char)(i+'0');
+        port = open(portNamei.c_str(), O_RDWR | O_NONBLOCK);
 
-    
-    cfsetospeed(&tio, B921600);
-    cfsetispeed(&tio, B921600);
-    tcsetattr(port, TCSANOW, &tio);
+        cfsetospeed(&tio, B921600);
+        cfsetispeed(&tio, B921600);
+        tcsetattr(port, TCSANOW, &tio);
 
-    if (port <= 0) {
-        cerr << RED << "Failed to open \"" << portName << "\"" << WHITE << endl;
+        if (port <= 0)
+            cerr << RED << "Failed to open \"" << portNamei << "\"" << WHITE << endl;
+        else
+            connected = true;
+
+        i++;
+    } 
+
+    if (!connected)
         ret = STATUS_ERROR;
-    }
-
-    // flush();
 
     return ret;
 }
@@ -79,21 +88,21 @@ status_t XV25::send(string cmd, bool hasResponse)
     char bytes[bufferSize];
     int nb = 0;
     int nbSent = 0, nbRead = 0;
-    timestamp_t t0_send = 0, t1_send = 0, t_receive[100];
+    // timestamp_t t0_send = 0, t1_send = 0, t_receive[100];
     int cnt_t_receive = 0;
 
-    cerr << endl << endl << GREEN << "send(" << cmd.substr(0, cmd.size()-1) << ")" << WHITE << endl;
+//    cerr << endl << endl << GREEN << "send(" << cmd.substr(0, cmd.size()-1) << ")" << WHITE << endl;
 
     if (port > 0) {
-        t0_send = get_timestamp();
+        // t0_send = get_timestamp();
         while (nbSent < (int)cmd.size()) {
             nb = write(port, cmd.substr(nbSent, bufferSize-nbSent).c_str(), 
                             min((size_t)bufferSize, (cmd.substr(nbSent, bufferSize-nbSent).size())));
             nbSent += nb;
         }
-        t1_send = get_timestamp();
+        // t1_send = get_timestamp();
 
-        cerr << BLUE << "Send " << nbSent << " bytes in " << (t1_send - t0_send) << " us" << WHITE << endl;
+//        cerr << BLUE << "Send " << nbSent << " bytes in " << (t1_send - t0_send) << " us" << WHITE << endl;
 
         do {
             bytes[0] = 0;
@@ -105,14 +114,16 @@ status_t XV25::send(string cmd, bool hasResponse)
                     if (26 == bytes[i])
                         nbRead--;
 
-                t_receive[cnt_t_receive++] = get_timestamp();
+                // t_receive[cnt_t_receive++] = get_timestamp();
 
-                cerr << BLUE << "received " << nb << " bytes" << WHITE << " (total=" << nbRead << ")" << " in " << BLUE << (t_receive[cnt_t_receive-1] - t1_send) << " us" << WHITE << " : \"";
+//                cerr << BLUE << "received " << nb << " bytes" << WHITE << " (total=" << nbRead << ")" << " in " << BLUE << (t_receive[cnt_t_receive-1] - t1_send) << " us" << WHITE << " : \"";
+/*
                 for (int i = 0; i < nb; i++) {
                     cerr << "/";
                     printChar((char)bytes[i]);
                 }
                 cerr << "\"" << endl;
+*/
             }
         } while (nb == -1 || (!hasResponse && nbSent+1 != nbRead) || (hasResponse && nbSent != nbRead));
     } else {
@@ -149,29 +160,29 @@ string XV25::receive(void)
     int nb;
     bool gotEOF = false;
 
-    timestamp_t t0 = 0, t1[100];
-    int cnt_t = 0;
+    // timestamp_t t0 = 0, t1[100];
+    // int cnt_t = 0;
 
 
-    cerr << endl << endl << GREEN << "receive()" << WHITE << endl;
+//    cerr << endl << endl << GREEN << "receive()" << WHITE << endl;
 
     if (0 < port) {
 
-        t0 = get_timestamp();
+        // t0 = get_timestamp();
 
         do {
             nb = read(port, &bytes, bufferSize);
             // usleep(1);
         } while (-1 == nb);
 
-        t1[cnt_t++] = get_timestamp();
+        // t1[cnt_t++] = get_timestamp();
 
-        cerr << BLUE << "received " << nb << " bytes" << WHITE << " in " << BLUE << (t1[cnt_t-1]-t0) << " us" << WHITE << " : \"";
-        for (int i = 0; i < nb; i++) {
-            cerr << "/";
-            printChar((char)bytes[i]);
-        }
-        cerr << "\"" << endl;
+//        cerr << BLUE << "received " << nb << " bytes" << WHITE << " in " << BLUE << (t1[cnt_t-1]-t0) << " us" << WHITE << " : \"";
+//        for (int i = 0; i < nb; i++) {
+//            cerr << "/";
+//            printChar((char)bytes[i]);
+//        }
+//        cerr << "\"" << endl;
 
         bytes[nb] = '\0';
         response += (char*)bytes;
@@ -184,14 +195,14 @@ string XV25::receive(void)
                 nb = read(port, &bytes, bufferSize-1);
 
                 if (nb >= 0) {
-                    t1[cnt_t++] = get_timestamp();
+                    // t1[cnt_t++] = get_timestamp();
 
-                    cerr << BLUE << "received " << nb << " bytes" << WHITE << " in " << BLUE << (t1[cnt_t-1]-t1[cnt_t-2]) << " us" << WHITE << " : \"";
-                    for (int i = 0; i < nb; i++) {
-                        cerr << "/";
-                        printChar((char)bytes[i]);
-                    }
-                    cerr << "\"" << endl;
+//                    cerr << BLUE << "received " << nb << " bytes" << WHITE << " in " << BLUE << (t1[cnt_t-1]-t1[cnt_t-2]) << " us" << WHITE << " : \"";
+//                    for (int i = 0; i < nb; i++) {
+//                        cerr << "/";
+//                        printChar((char)bytes[i]);
+//                    }
+//                    cerr << "\"" << endl;
 
                     // usleep(1);
                     for (int i = 0; i < nb && !gotEOF; i++)
@@ -558,9 +569,15 @@ string XV25::interpretCommand(string command)
     string cmd, response, tmp;
     vector<string> parameters;
     unsigned long int start, end;
+    ostringstream responseStream;
+
+    cerr << "Interpret command " << command << endl;
 
     if (string::npos != (end = command.find_first_of(' '))) {
-        cmd = command.substr(0, end-1);
+        cmd = command.substr(0, end);
+
+        cerr << "    Command = " << cmd << " [0, " << (end-1) << "]" << endl;
+
         start = end+1;
 
         do {
@@ -569,6 +586,9 @@ string XV25::interpretCommand(string command)
                 tmp = command.substr(start, end-start);
             else
                 tmp = command.substr(start);
+
+            cerr << "    Parameter = \"" << tmp << "\"" << endl;
+
             parameters.push_back(tmp);
         } while (string::npos != end);
     } else {
@@ -579,18 +599,13 @@ string XV25::interpretCommand(string command)
 
     switch(my_hash(cmd.c_str())) {
         case GET_VERSION:
-            // response += "getVersion";
-            cerr << "This is a get version" << endl;
             getVersion(&response);
-            cerr << "received from xv \"" << response << "\"" << endl;
             break;
         case GET_BATTERY_LEVEL:
-            response += "getBatteryLevel";
-            /*
             int batteryLevel;
             getBatteryLevel(&batteryLevel);
-            response += batteryLevel;
-            */
+            responseStream << batteryLevel;
+            response += responseStream.str() + "%      ";
             break;
         case SET_TEST_MODE:
             response += "setTestMode(" + parameters[0] + ")";

@@ -180,7 +180,7 @@ function sendCommand(cmd) {
         xmlhttp = new XMLHttpRequest();
     else
         xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-    xmlhttp.open("POST", "sendCommand_simulated.php", true);
+    xmlhttp.open("POST", "sendCommand.php", true);
     xmlhttp.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
     xmlhttp.send(cmd);
 }
